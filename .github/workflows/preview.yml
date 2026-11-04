@@ -7,4 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: pip install pillow && python .preview/preview.py
+      - run: pip install pillow
+      - run: python .preview/preview.py 0
+      - run: python .preview/preview.py 9
+      - run: python .preview/preview.py 18
+      - run: python .preview/preview.py 27

@@ -55,6 +55,11 @@ for i, m in enumerate(["copper", "ruby", "plutonium"]):
     base, mt = ("diamond", "CYAN") if m == "ruby" else ("iron", "GRAY")
     for l in (1, 2):
         im = recolor(f"models/armor/{base}_layer_{l}.png", mt, C[m]); armor.paste(im, (i * 64, (l - 1) * 32), im)
+import sys
+start = int(sys.argv[1]); chunks = []
 for name, im in [("sheet", sheet), ("armor", armor)]:
-    b = io.BytesIO(); im.save(b, "PNG", optimize=True)
-    print(f"::notice title={name}::" + base64.b64encode(b.getvalue()).decode())
+    b = io.BytesIO(); im.save(b, "PNG", optimize=True); d = base64.b64encode(b.getvalue()).decode()
+    chunks += [(f"{name}-{i // 4000:02d}", d[i:i + 4000]) for i in range(0, len(d), 4000)]
+for t, c in chunks[start:start + 9]:
+    print(f"::notice title={t}::" + c)
+print("total chunks", len(chunks))
