@@ -16,6 +16,9 @@ import java.io.IOException;
  */
 public final class Recolor {
 
+    private static final double REFERENCE_PERCENTILE = 0.9;
+    private static final double HIGHLIGHT = 0.4;
+
     public enum Match {
         /** Low-saturation pixels: iron tools, armor, ingots, blocks. Leaves wooden handles alone. */
         GRAY,
@@ -61,8 +64,9 @@ public final class Recolor {
         int[] px = src.getRGB(0, 0, w, h, null, 0, w);
         boolean[] hit = new boolean[px.length];
 
-        // average brightness of the matched pixels, so the target color lands on the mid-tone
-        double sum = 0;
+        // Reference brightness = 90th percentile of the matched pixels. Vanilla iron is near-white, so
+        // anchoring the target color high keeps tool heads colored instead of washing out to white.
+        double[] lumas = new double[px.length];
         int count = 0;
         float[] hsb = new float[3];
         for (int i = 0; i < px.length; i++) {
@@ -74,11 +78,15 @@ public final class Recolor {
             Color.RGBtoHSB(r, g, b, hsb);
             if (matches(match, hsb)) {
                 hit[i] = true;
-                sum += luma(r, g, b);
-                count++;
+                lumas[count++] = luma(r, g, b);
             }
         }
-        double mean = count == 0 ? 128 : Math.max(1, sum / count);
+        double mean = 128;
+        if (count > 0) {
+            double[] sorted = java.util.Arrays.copyOf(lumas, count);
+            java.util.Arrays.sort(sorted);
+            mean = Math.max(1, sorted[Math.min(count - 1, (int) (count * REFERENCE_PERCENTILE))]);
+        }
 
         int tr = (target >> 16) & 0xFF, tg = (target >> 8) & 0xFF, tb = target & 0xFF;
         boolean useBg = background != null && background.getWidth() == w && background.getHeight() >= h;
@@ -118,7 +126,7 @@ public final class Recolor {
 
     /** Darker than average: scale the target down. Brighter: blend toward white for highlights. */
     private static int shade(int c, double ratio) {
-        double v = ratio <= 1.0 ? c * ratio : c + (255 - c) * Math.min(1.0, (ratio - 1.0) * 1.3);
+        double v = ratio <= 1.0 ? c * ratio : c + (255 - c) * Math.min(1.0, (ratio - 1.0) * HIGHLIGHT);
         return Math.max(0, Math.min(255, (int) Math.round(v)));
     }
 

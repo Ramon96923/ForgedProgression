@@ -1,56 +1,70 @@
 # Forged Progression (Forge 1.12.2)
 
-Adds copper, tin, bronze and steel, with tools and armor for each tier, and raises the
-pickaxe tier needed for vanilla ores so every metal is a required step.
+Adds copper, tin, bronze, steel, ruby, uranium and plutonium, with tools and armor for each
+tier, and raises the pickaxe tier needed for vanilla ores so every material is a required step.
 
 ## Progression
 
-| Tier | Pickaxe            | Unlocks                                  |
-|------|--------------------|------------------------------------------|
-| 0    | Wood               | Stone, coal                              |
-| 1    | Stone / **Copper** | Copper ore, tin ore                      |
-| 2    | **Bronze** / Iron  | Iron, gold, redstone, lapis              |
-| 3    | **Steel** / Diamond| Diamond, emerald                         |
+| Tier | Pickaxe               | Unlocks                                         |
+|------|-----------------------|-------------------------------------------------|
+| 0    | Wood                  | Stone, coal                                     |
+| 1    | Stone / **Copper**    | Copper ore, tin ore                             |
+| 2    | **Bronze** / Iron     | Iron, gold, redstone, lapis                     |
+| 3    | **Steel** / Diamond   | Diamond, emerald, **ruby ore**                  |
+| 4    | **Ruby**              | **Uranium ore**                                 |
+| 5    | **Uranium**           | **Plutonium ore** (in the End)                  |
+| 6    | **Plutonium**         | Top tier                                        |
 
 Stone pickaxes can no longer harvest iron, and iron pickaxes can no longer harvest diamonds.
 
 ## Materials
 
-- **Copper ore** — y 30–96, common. Smelt → copper ingot.
-- **Tin ore** — y 10–64, less common. Smelt → tin ingot.
-- **Bronze** — 3 copper ingots + 1 tin ingot (shapeless) → 4 bronze ingots.
-- **Steel** — 1 iron ingot + 2 coal/charcoal (shapeless) → steel blend; smelt → steel ingot.
-- Storage blocks for all four metals (9 ingots ↔ 1 block, usable as beacon bases).
+- **Copper ore**: Overworld y 30–96, common. Smelt it into copper ingots.
+- **Tin ore**: Overworld y 10–64, less common. Smelt it into tin ingots.
+- **Bronze**: craft 3 copper ingots + 1 tin ingot (shapeless) into 4 bronze ingots.
+- **Steel**: craft 1 iron ingot + 2 coal/charcoal (shapeless) into steel blend, then smelt it into a steel ingot.
+- **Ruby ore**: Overworld y 4–24, rare. Drops a ruby directly, like diamond ore (Fortune works).
+- **Uranium ore**: Overworld y 4–18, very rare. Smelt it into uranium ingots.
+- **Plutonium ore**: generates in **End stone**. Smelt it into plutonium ingots.
+- Every material has a storage block (9 ↔ 1), usable as a beacon base.
 
 ## Stats
 
-| Material | Harvest | Durability | Speed | Armor (helm/chest/legs/boots) | Armor durability factor |
-|----------|---------|------------|-------|-------------------------------|-------------------------|
-| Copper   | 1       | 200        | 5.0   | 1 / 4 / 3 / 1                 | 10                      |
-| Bronze   | 2       | 350        | 6.0   | 2 / 5 / 4 / 2                 | 14                      |
-| Steel    | 3       | 900        | 7.0   | 3 / 7 / 6 / 2 (+1 toughness)  | 24                      |
-| *Iron (vanilla)* | 2 | 250      | 6.0   | 2 / 6 / 5 / 2                 | 15                      |
+| Material  | Harvest | Durability | Speed | Sword dmg | Armor (helm/chest/legs/boots) | Toughness |
+|-----------|---------|------------|-------|-----------|-------------------------------|-----------|
+| Copper    | 1       | 200        | 5.0   | 5.5       | 1 / 4 / 3 / 1                 | 0         |
+| Bronze    | 2       | 350        | 6.0   | 6         | 2 / 5 / 4 / 2                 | 0         |
+| Steel     | 3       | 900        | 7.0   | 6.5       | 3 / 7 / 6 / 2                 | 1         |
+| Ruby      | 4       | 1800       | 9.0   | 7.5       | 3 / 8 / 6 / 3                 | 2.5       |
+| Uranium   | 5       | 2600       | 10.0  | 8         | 3 / 9 / 7 / 3                 | 3         |
+| Plutonium | 6       | 3500       | 12.0  | 9         | 4 / 9 / 7 / 4                 | 4         |
+| *Diamond (vanilla)* | 3 | 1561     | 8.0   | 7         | 3 / 8 / 6 / 3                 | 2         |
 
-Tools and armor use vanilla crafting shapes and repair in an anvil with their ingot.
-Everything is registered in the Ore Dictionary (`oreCopper`, `ingotBronze`, `ingotSteel`, ...),
-so recipes accept metals from other mods too.
+Tools and armor use vanilla crafting shapes and repair in an anvil with their ingot or gem.
+Everything is registered in the Ore Dictionary (`oreCopper`, `ingotBronze`, `gemRuby`, `ingotUranium`, ...),
+so recipes accept the same metals from other mods.
+
+## Textures
+
+There are no texture files. Every texture is built when the game loads by recoloring the matching
+vanilla one: copper tools are recolored iron tools, ruby gear is recolored diamond gear, the ores are
+recolored iron/diamond ore, and plutonium ore puts the spots on End stone. Resource packs that change
+the vanilla iron or diamond textures change these too. The colors live in `client/ClientTextures.java`.
 
 ## Config
 
 `config/forgedprogression.cfg` (also editable in-game via Mods → Config):
-- `progression` — turn gating off or change the required level of each vanilla ore.
-- `worldgen` — vein size, veins per chunk and height range for copper and tin.
+- `progression`: turn gating off, or change the required level of each vanilla ore.
+- `worldgen`: enable/disable, vein size, veins per chunk and height range for each ore.
 
-## Building
+## Getting the jar
+
+Every push is built by GitHub Actions. Open the **Actions** tab, click the latest **Build** run and
+download **forgedprogression-1.12.2** under Artifacts. The `.jar` inside goes in your `mods` folder.
+
+### Building locally
 
 1. Download the **1.12.2 MDK** (14.23.5.2860) from files.minecraftforge.net and unzip it.
-2. Delete the MDK's `src` folder, then copy this project's `src/`, `build.gradle` and `README.md` into it
-   (keep the MDK's `gradlew`, `gradlew.bat`, `gradle/` and `settings.gradle`).
-3. Make sure Java 8 is installed (the build uses a Java 8 toolchain).
-4. Run `gradlew build` (Windows) or `./gradlew build` (macOS/Linux).
-5. The mod jar is in `build/libs/forgedprogression-1.12.2-1.0.0.jar` — drop it in your `mods` folder.
-
-To test in a dev client: `gradlew genIntellijRuns` (or `genEclipseRuns`), then run `runClient`.
-
-Textures are simple generated placeholders; replace the PNGs under
-`src/main/resources/assets/forgedprogression/textures/` with your own any time.
+2. Copy this repo's `src/`, `build.gradle` and `settings.gradle` into it (keep the MDK's `gradlew` and `gradle/`).
+3. With Java 8 installed, run `gradlew build`.
+4. The jar is in `build/libs/`.
