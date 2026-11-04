@@ -13,16 +13,17 @@ def match(m, h, s, v):
     if m == "CYAN": return s > 0.12 and 140 <= h * 360 <= 220
     return s > 0.15 and v > 0.15
 def luma(r, g, b): return 0.299 * r + 0.587 * g + 0.114 * b
+PCT, HL = 0.5, 1.3
 def shade(c, ratio):
-    v = c * ratio if ratio <= 1 else c + (255 - c) * min(1.0, (ratio - 1) * 1.3)
+    v = c * ratio if ratio <= 1 else c + (255 - c) * min(1.0, (ratio - 1) * HL)
     return max(0, min(255, round(v)))
 def recolor(src, m, color, bg=None):
-    img = tex(src); px = list(img.getdata()); hit = []; s = 0
+    img = tex(src); px = list(img.getdata()); hit = []; ls = []
     for (r, g, b, a) in px:
         h, sa, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
         ok = a > 0 and match(m, h, sa, v); hit.append(ok)
-        if ok: s += luma(r, g, b)
-    mean = max(1, s / max(1, sum(hit)))
+        if ok: ls.append(luma(r, g, b))
+    ls.sort(); mean = max(1, ls[min(len(ls) - 1, int(len(ls) * PCT))]) if ls else 128
     bgpx = list(tex(bg).getdata()) if bg else None
     tr, tg, tb = (color >> 16) & 255, (color >> 8) & 255, color & 255
     out = []
@@ -35,21 +36,30 @@ def recolor(src, m, color, bg=None):
 
 C = {"copper": 0xE07C48, "tin": 0xB4C3D7, "bronze": 0xCD9646, "steel": 0x78829A,
      "ruby": 0xDC283C, "uranium": 0x6EDC3C, "plutonium": 0xAA46DC}
-rows = []
-for m in ["copper", "tin", "bronze", "steel", "ruby", "uranium", "plutonium"]:
-    gem = m == "ruby"; base = "diamond" if gem else "iron"; mt = "CYAN" if gem else "GRAY"
-    row = [tex(f"items/{base}_sword.png"), recolor("items/diamond.png" if gem else "items/iron_ingot.png", mt, C[m]),
-           recolor(f"blocks/{base}_block.png", mt, C[m])]
-    ore = "blocks/diamond_ore.png" if gem else "blocks/iron_ore.png"
-    row.append(recolor(ore, "COLORED", C[m], "blocks/end_stone.png" if m == "plutonium" else None))
-    if m != "tin":
-        for p in ["pickaxe", "axe", "shovel", "hoe", "sword", "helmet", "chestplate", "leggings", "boots"]:
-            row.append(recolor(f"items/{base}_{p}.png", mt, C[m]))
-    rows.append(row[1:])
-rows.append([recolor("items/gunpowder.png", "GRAY", 0x5A606E)])
-sheet = Image.new("RGBA", (13 * 18, len(rows) * 18), (70, 70, 70, 255))
-for y, row in enumerate(rows):
-    for x, im in enumerate(row): sheet.paste(im, (x * 18 + 1, y * 18 + 1), im)
+def build():
+  rows = []
+  for m in ["copper", "tin", "bronze", "steel", "ruby", "uranium", "plutonium"]:
+      gem = m == "ruby"; base = "diamond" if gem else "iron"; mt = "CYAN" if gem else "GRAY"
+      row = [tex(f"items/{base}_sword.png"), recolor("items/diamond.png" if gem else "items/iron_ingot.png", mt, C[m]),
+             recolor(f"blocks/{base}_block.png", mt, C[m])]
+      ore = "blocks/diamond_ore.png" if gem else "blocks/iron_ore.png"
+      row.append(recolor(ore, "COLORED", C[m], "blocks/end_stone.png" if m == "plutonium" else None))
+      if m != "tin":
+          for p in ["pickaxe", "axe", "shovel", "hoe", "sword", "helmet", "chestplate", "leggings", "boots"]:
+              row.append(recolor(f"items/{base}_{p}.png", mt, C[m]))
+      rows.append(row[1:])
+  rows.append([recolor("items/gunpowder.png", "GRAY", 0x5A606E)])
+  sheet = Image.new("RGBA", (13 * 18, len(rows) * 18), (70, 70, 70, 255))
+  for y, row in enumerate(rows):
+      for x, im in enumerate(row): sheet.paste(im, (x * 18 + 1, y * 18 + 1), im)
+
+  return sheet
+sheets = []
+for PCT, HL in [(0.8, 0.6), (0.9, 0.4), (0.95, 0.3)]:
+    sheets.append(build())
+sheet = Image.new("RGBA", (sheets[0].width * 3 + 20, sheets[0].height), (30, 30, 30, 255))
+for i, sh in enumerate(sheets): sheet.paste(sh, (i * (sh.width + 10), 0))
+PCT, HL = 0.9, 0.4
 armor = Image.new("RGBA", (64 * 3, 32 * 2), (70, 70, 70, 255))
 for i, m in enumerate(["copper", "ruby", "plutonium"]):
     base, mt = ("diamond", "CYAN") if m == "ruby" else ("iron", "GRAY")
