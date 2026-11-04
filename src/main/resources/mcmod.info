@@ -1,0 +1,13 @@
+[
+  {
+    "modid": "forgedprogression",
+    "name": "Forged Progression",
+    "description": "Copper, tin, bronze and steel ores, tools and armor, with tiered ore progression.",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "authorList": [
+      "you"
+    ],
+    "credits": ""
+  }
+]

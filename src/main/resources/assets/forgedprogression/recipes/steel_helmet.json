@@ -1,0 +1,17 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "XXX",
+    "X X"
+  ],
+  "key": {
+    "X": {
+      "type": "forge:ore_dict",
+      "ore": "ingotSteel"
+    }
+  },
+  "result": {
+    "item": "forgedprogression:steel_helmet",
+    "count": 1
+  }
+}
