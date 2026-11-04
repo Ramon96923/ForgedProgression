@@ -7,6 +7,7 @@ import com.forgedprogression.world.OreGenerator;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -19,9 +20,12 @@ public class ForgedProgression {
 
     public static final String MODID = "forgedprogression";
     public static final String NAME = "Forged Progression";
-    public static final String VERSION = "1.0.0";
+    public static final String VERSION = "1.1.0";
 
     public static final Logger LOGGER = LogManager.getLogger(NAME);
+
+    @SidedProxy(clientSide = "com.forgedprogression.client.ClientProxy", serverSide = "com.forgedprogression.CommonProxy")
+    public static CommonProxy proxy;
 
     public static final CreativeTabs TAB = new CreativeTabs(MODID) {
         @Override
@@ -39,5 +43,6 @@ public class ForgedProgression {
     public void init(FMLInitializationEvent event) {
         ModSmelting.register();
         Progression.apply();
+        proxy.init();
     }
 }

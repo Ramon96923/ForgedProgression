@@ -32,18 +32,29 @@ public final class RegistryHandler {
         registerOreDictionary();
     }
 
-    /** Ore dictionary names make these interchangeable with copper/tin/bronze/steel from other mods. */
+    /** Ore dictionary names make these interchangeable with the same metals from other mods. */
     private static void registerOreDictionary() {
         OreDictionary.registerOre("oreCopper", ModBlocks.COPPER_ORE);
         OreDictionary.registerOre("oreTin", ModBlocks.TIN_ORE);
+        OreDictionary.registerOre("oreRuby", ModBlocks.RUBY_ORE);
+        OreDictionary.registerOre("oreUranium", ModBlocks.URANIUM_ORE);
+        OreDictionary.registerOre("orePlutonium", ModBlocks.PLUTONIUM_ORE);
+
         OreDictionary.registerOre("blockCopper", ModBlocks.COPPER_BLOCK);
         OreDictionary.registerOre("blockTin", ModBlocks.TIN_BLOCK);
         OreDictionary.registerOre("blockBronze", ModBlocks.BRONZE_BLOCK);
         OreDictionary.registerOre("blockSteel", ModBlocks.STEEL_BLOCK);
+        OreDictionary.registerOre("blockRuby", ModBlocks.RUBY_BLOCK);
+        OreDictionary.registerOre("blockUranium", ModBlocks.URANIUM_BLOCK);
+        OreDictionary.registerOre("blockPlutonium", ModBlocks.PLUTONIUM_BLOCK);
+
         OreDictionary.registerOre("ingotCopper", ModItems.COPPER_INGOT);
         OreDictionary.registerOre("ingotTin", ModItems.TIN_INGOT);
         OreDictionary.registerOre("ingotBronze", ModItems.BRONZE_INGOT);
         OreDictionary.registerOre("ingotSteel", ModItems.STEEL_INGOT);
+        OreDictionary.registerOre("gemRuby", ModItems.RUBY);
+        OreDictionary.registerOre("ingotUranium", ModItems.URANIUM_INGOT);
+        OreDictionary.registerOre("ingotPlutonium", ModItems.PLUTONIUM_INGOT);
     }
 
     private RegistryHandler() {}

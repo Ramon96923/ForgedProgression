@@ -1,0 +1,17 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "X X",
+    "X X"
+  ],
+  "key": {
+    "X": {
+      "type": "forge:ore_dict",
+      "ore": "ingotUranium"
+    }
+  },
+  "result": {
+    "item": "forgedprogression:uranium_boots",
+    "count": 1
+  }
+}

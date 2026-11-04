@@ -1,0 +1,18 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "X X",
+    "XXX",
+    "XXX"
+  ],
+  "key": {
+    "X": {
+      "type": "forge:ore_dict",
+      "ore": "gemRuby"
+    }
+  },
+  "result": {
+    "item": "forgedprogression:ruby_chestplate",
+    "count": 1
+  }
+}
