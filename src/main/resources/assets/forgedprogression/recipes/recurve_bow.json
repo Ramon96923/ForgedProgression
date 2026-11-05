@@ -1,0 +1,26 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    " IS",
+    "# S",
+    " IS"
+  ],
+  "key": {
+    "I": {
+      "type": "forge:ore_dict",
+      "ore": "ingotSteel"
+    },
+    "#": {
+      "type": "forge:ore_dict",
+      "ore": "stickWood"
+    },
+    "S": {
+      "type": "forge:ore_dict",
+      "ore": "string"
+    }
+  },
+  "result": {
+    "item": "forgedprogression:recurve_bow",
+    "count": 1
+  }
+}

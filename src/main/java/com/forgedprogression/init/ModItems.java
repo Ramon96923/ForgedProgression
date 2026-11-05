@@ -2,6 +2,7 @@ package com.forgedprogression.init;
 
 import com.forgedprogression.ForgedProgression;
 import com.forgedprogression.item.ItemModAxe;
+import com.forgedprogression.item.ItemModBow;
 import com.forgedprogression.item.ItemModPickaxe;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
@@ -30,6 +31,12 @@ public final class ModItems {
     public static final Item URANIUM_INGOT   = reg(new Item(), "uranium_ingot");
     public static final Item PLUTONIUM_INGOT = reg(new Item(), "plutonium_ingot");
     public static final Item NEUTRONIUM_INGOT = reg(new Item(), "neutronium_ingot");
+
+    // bows: durability, draw ticks, arrow speed ×, arrow damage ×, bonus knockback, enchantability, repair material
+    // (vanilla bow: 384 durability, 20 tick draw)
+    public static final Item HUNTING_BOW = reg(new ItemModBow(160, 14, 0.85F, 0.8, 0, 1, null), "hunting_bow");
+    public static final Item RECURVE_BOW = reg(new ItemModBow(700, 18, 1.15F, 1.2, 0, 8, "ingotSteel"), "recurve_bow");
+    public static final Item WAR_BOW = reg(new ItemModBow(2000, 36, 1.4F, 1.6, 1, 14, "ingotPlutonium"), "war_bow");
 
     // tools: material, axe damage, axe speed
     public static final Item BRONZE_PICKAXE;

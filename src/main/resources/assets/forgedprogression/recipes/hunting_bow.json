@@ -1,0 +1,22 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    " #",
+    "#S",
+    " #"
+  ],
+  "key": {
+    "#": {
+      "type": "forge:ore_dict",
+      "ore": "stickWood"
+    },
+    "S": {
+      "type": "forge:ore_dict",
+      "ore": "string"
+    }
+  },
+  "result": {
+    "item": "forgedprogression:hunting_bow",
+    "count": 1
+  }
+}

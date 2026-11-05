@@ -1,0 +1,25 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    " PS",
+    "B S",
+    " PS"
+  ],
+  "key": {
+    "P": {
+      "type": "forge:ore_dict",
+      "ore": "ingotPlutonium"
+    },
+    "B": {
+      "item": "minecraft:blaze_rod"
+    },
+    "S": {
+      "type": "forge:ore_dict",
+      "ore": "string"
+    }
+  },
+  "result": {
+    "item": "forgedprogression:war_bow",
+    "count": 1
+  }
+}

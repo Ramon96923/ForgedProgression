@@ -23,7 +23,9 @@ public final class Recolor {
         /** Cyan/teal pixels: diamond items and blocks. */
         CYAN,
         /** Any saturated pixel: the colored spots on ore textures (stone stays as is). */
-        COLORED
+        COLORED,
+        /** Brown wood tones: bow limbs. Gray grip and string are left alone. */
+        WOOD
     }
 
     /**
@@ -60,6 +62,13 @@ public final class Recolor {
         final int color;
         final ResourceLocation background; // nullable: replaces unmatched pixels (e.g. end stone behind ore spots)
         final Shading shading;
+        /** Vanilla's pulled-back bow textures draw the arrow on the diagonal; skip it so the arrow stays brown. */
+        boolean skipBowArrow;
+
+        public Spec skipBowArrow() {
+            this.skipBowArrow = true;
+            return this;
+        }
 
         public Spec(String source, Match match, int color) {
             this(source, match, color, null, Shading.DEFAULT);
@@ -80,7 +89,7 @@ public final class Recolor {
         public BufferedImage render(IResourceManager manager) throws IOException {
             BufferedImage src = read(manager, source);
             BufferedImage bg = background == null ? null : read(manager, background);
-            return apply(src, match, color, bg, shading);
+            return apply(src, match, color, bg, shading, skipBowArrow);
         }
     }
 
@@ -90,7 +99,8 @@ public final class Recolor {
         }
     }
 
-    public static BufferedImage apply(BufferedImage src, Match match, int target, BufferedImage background, Shading s) {
+    public static BufferedImage apply(BufferedImage src, Match match, int target, BufferedImage background, Shading s,
+                                      boolean skipBowArrow) {
         int w = src.getWidth();
         int h = src.getHeight();
         int[] px = src.getRGB(0, 0, w, h, null, 0, w);
@@ -106,6 +116,9 @@ public final class Recolor {
             }
             int r = (px[i] >> 16) & 0xFF, g = (px[i] >> 8) & 0xFF, b = px[i] & 0xFF;
             Color.RGBtoHSB(r, g, b, hsb);
+            if (skipBowArrow && onArrowDiagonal(i % w, i / w, w)) {
+                continue;
+            }
             if (matches(match, hsb)) {
                 hit[i] = true;
                 lumas[count++] = luma(r, g, b);
@@ -163,9 +176,18 @@ public final class Recolor {
                 return sat > 0.12F && hue >= 140F && hue <= 220F;
             case COLORED:
                 return sat > 0.15F && bri > 0.15F;
+            case WOOD:
+                return sat > 0.35F && hue >= 20F && hue <= 55F;
             default:
                 return false;
         }
+    }
+
+    /** In vanilla's 16x16 pulling textures the arrow shaft sits at x == y and x == y + 1 (scaled for HD packs). */
+    private static boolean onArrowDiagonal(int x, int y, int width) {
+        int sx = x * 16 / width;
+        int sy = y * 16 / width;
+        return sx == sy || sx == sy + 1;
     }
 
     /** Darker than the reference: scale the target down. Brighter: blend toward white. */

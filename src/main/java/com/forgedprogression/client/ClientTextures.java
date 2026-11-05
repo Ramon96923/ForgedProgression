@@ -81,6 +81,11 @@ public final class ClientTextures {
             }
         }
 
+        // bows: recolor the wooden limbs of the vanilla bow
+        bow(map, "hunting_bow", 0xC4A46C);   // pale raw wood
+        bow(map, "recurve_bow", 0x78829A);   // steel
+        bow(map, "war_bow", 0x8C3CC8);       // plutonium
+
         // ores: recolor the spots on iron/diamond ore
         map.put(block("copper_ore"), new Spec(MC + "blocks/iron_ore.png", Match.COLORED, COPPER.color));
         map.put(block("tin_ore"), new Spec(MC + "blocks/iron_ore.png", Match.COLORED, TIN.color));
@@ -90,6 +95,14 @@ public final class ClientTextures {
         map.put(block("plutonium_ore"), new Spec(MC + "blocks/iron_ore.png", Match.COLORED, PLUTONIUM.color,
                 MC + "blocks/end_stone.png", Shading.DEFAULT));
         return map;
+    }
+
+    private static void bow(Map<String, Spec> map, String name, int color) {
+        map.put(item(name + "_standby"), new Spec(MC + "items/bow_standby.png", Match.WOOD, color));
+        for (int n = 0; n < 3; n++) {
+            map.put(item(name + "_pulling_" + n),
+                    new Spec(MC + "items/bow_pulling_" + n + ".png", Match.WOOD, color).skipBowArrow());
+        }
     }
 
     private static String item(String name) { return ForgedProgression.MODID + ":items/" + name; }

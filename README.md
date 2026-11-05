@@ -54,6 +54,18 @@ vanilla one: copper tools are recolored iron tools, ruby gear is recolored diamo
 recolored iron/diamond ore, and plutonium ore puts the spots on End stone. Resource packs that change
 the vanilla iron or diamond textures change these too. The colors live in `client/ClientTextures.java`.
 
+## Bows
+
+| Bow          | When       | Recipe                                               | Draw time | Arrow damage* | Durability | Extra                |
+|--------------|------------|------------------------------------------------------|-----------|---------------|------------|----------------------|
+| Hunting Bow  | Day one    | 3 sticks + 1 string (` #` / `#S` / ` #`)             | 0.7 s     | ~5            | 160        | Fast to draw         |
+| *Bow (vanilla)* |         | 3 sticks + 3 string                                  | 1.0 s     | ~6            | 384        |                      |
+| Recurve Bow  | Mid game   | 2 steel ingots + 1 stick + 3 string                  | 0.9 s     | ~9            | 700        | Repairs with steel   |
+| War Bow      | Late game  | 2 plutonium ingots + 1 blaze rod + 3 string          | 1.8 s     | ~14           | 2000       | Built-in Punch I, repairs with plutonium |
+
+\*Fully drawn, before crits and Power. Faster arrows also fly farther and flatter. The bows zoom in while drawing
+like the vanilla bow, take all the usual bow enchantments, and their textures are recolors of the vanilla bow.
+
 ## Bosses
 
 The Ender Dragon and the Wither are scaled up to keep pace with the new gear:
