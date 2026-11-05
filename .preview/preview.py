@@ -13,14 +13,14 @@ def match(m, h, s, v):
     if m == "CYAN": return s > 0.12 and 140 <= h * 360 <= 220
     return s > 0.15 and v > 0.15
 def luma(r, g, b): return 0.299 * r + 0.587 * g + 0.114 * b
-def recolor(src, m, color, pct=0.9, hl=0.4, gamma=1.0):
+def recolor(src, m, color, pct=0.9, hl=0.4, gamma=1.0, spec=0.0, specamt=0.0):
     img = tex(src); px = list(img.getdata()); hit = []; ls = []
     for (r, g, b, a) in px:
         h, sa, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
         ok = a > 0 and match(m, h, sa, v); hit.append(ok)
         if ok: ls.append(luma(r, g, b))
     ls.sort(); ref = max(1, ls[min(len(ls) - 1, int(len(ls) * pct))]) if ls else 128
-    lo = ls[0] if ls else 0
+    sref = ls[min(len(ls) - 1, int(len(ls) * (1 - spec)))] if ls and spec > 0 else 999
     tr, tg, tb = (color >> 16) & 255, (color >> 8) & 255, color & 255
     def shade(c, k):
         v = c * k if k <= 1 else c + (255 - c) * min(1.0, (k - 1) * hl)
@@ -30,7 +30,9 @@ def recolor(src, m, color, pct=0.9, hl=0.4, gamma=1.0):
         if hit[i]:
             k = luma(r, g, b) / ref
             if gamma != 1.0: k = k ** gamma  # >1 stretches contrast around the reference
-            out.append((shade(tr, k), shade(tg, k), shade(tb, k), a))
+            o = [shade(tr, k), shade(tg, k), shade(tb, k)]
+            if luma(r, g, b) >= sref: o = [round(c + (255 - c) * specamt) for c in o]
+            out.append((o[0], o[1], o[2], a))
         else: out.append((r, g, b, a))
     o = Image.new("RGBA", img.size); o.putdata(out); return o
 
@@ -44,20 +46,20 @@ def grid(rows, cell, gap=2, bg=(70, 70, 70, 255)):
     return s
 
 C = {"copper": 0xE07C48, "bronze": 0xCD9646, "steel": 0x78829A, "uranium": 0x6EDC3C, "plutonium": 0xAA46DC}
-VARIANTS = [("now", 0.9, 0.4, 1.0), ("A", 0.5, 1.0, 1.0), ("B", 0.6, 1.2, 1.4), ("C", 0.75, 1.0, 1.8)]
+VARIANTS = [("B", 0.6, 1.2, 1.4, 0, 0), ("D", 0.5, 2.5, 2.0, 0, 0), ("E", 0.6, 1.2, 1.4, 0.12, 0.7), ("F", 0.7, 1.5, 2.2, 0.08, 0.85)]
 # armor worn layers: one row per variant, columns = vanilla iron ref + metals
 rows = []
-for name, p, h, g in VARIANTS:
+for name, p, h, g, sp, sa in VARIANTS:
     row = [tex("models/armor/iron_layer_1.png"), tex("models/armor/diamond_layer_1.png")]
-    row += [recolor("models/armor/iron_layer_1.png", "GRAY", c, p, h, g) for c in C.values()]
+    row += [recolor("models/armor/iron_layer_1.png", "GRAY", c, p, h, g, sp, sa) for c in C.values()]
     rows.append(row)
 armor = grid(rows, 64, 4)
 # armor items: same variants
 irows = []
-for name, p, h, g in VARIANTS:
+for name, p, h, g, sp, sa in VARIANTS:
     r = []
     for c in C.values():
-        r += [recolor(f"items/iron_{x}.png", "GRAY", c, p, h, g) for x in ["helmet", "chestplate", "leggings", "boots"]]
+        r += [recolor(f"items/iron_{x}.png", "GRAY", c, p, h, g, sp, sa) for x in ["helmet", "chestplate", "leggings", "boots"]]
     irows.append(r)
 items = grid(irows, 16, 2)
 # neutronium candidates: ingot, block, sword, pickaxe, chestplate item, worn layer 1 (variant B)
