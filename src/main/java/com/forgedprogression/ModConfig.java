@@ -28,27 +28,60 @@ public class ModConfig {
 
     public static class DragonSettings {
         public boolean enabled = true;
-        @Config.RangeDouble(min = 0.1, max = 100) public double healthMultiplier = 2.5;
+        @Config.RangeDouble(min = 0.1, max = 100) public double healthMultiplier = 4.0;
         @Config.Comment("Multiplies damage from the dragon's melee, breath and fireballs.")
-        @Config.RangeDouble(min = 0, max = 100) public double damageMultiplier = 2.0;
+        @Config.RangeDouble(min = 0, max = 100) public double damageMultiplier = 3.0;
         @Config.Comment("Multiplies damage the dragon takes. Below 1 = tankier.")
-        @Config.RangeDouble(min = 0.01, max = 10) public double damageTakenMultiplier = 0.75;
+        @Config.RangeDouble(min = 0.01, max = 10) public double damageTakenMultiplier = 0.6;
         @Config.Comment("Seconds of Wither II applied when the dragon hits you. 0 = off.")
-        @Config.RangeInt(min = 0, max = 60) public int witherOnHitSeconds = 4;
+        @Config.RangeInt(min = 0, max = 60) public int witherOnHitSeconds = 6;
+        @Config.Comment("Seconds between lightning strikes on a random player fighting the dragon. 0 = off.")
+        @Config.RangeInt(min = 0, max = 600) public int lightningIntervalSeconds = 15;
+        @Config.Comment("Endermen summoned onto a random player per wave. 0 = off.")
+        @Config.RangeInt(min = 0, max = 10) public int endermenPerWave = 2;
+        @Config.Comment("Seconds between endermen waves.")
+        @Config.RangeInt(min = 1, max = 600) public int endermenIntervalSeconds = 30;
     }
 
     public static class WitherSettings {
         public boolean enabled = true;
-        @Config.RangeDouble(min = 0.1, max = 100) public double healthMultiplier = 3.0;
+        @Config.RangeDouble(min = 0.1, max = 100) public double healthMultiplier = 3.4;
         @Config.Comment("Multiplies damage from wither skulls.")
-        @Config.RangeDouble(min = 0, max = 100) public double damageMultiplier = 2.0;
+        @Config.RangeDouble(min = 0, max = 100) public double damageMultiplier = 2.5;
         @Config.Comment("Multiplies damage the Wither takes. Below 1 = tankier.")
-        @Config.RangeDouble(min = 0.01, max = 10) public double damageTakenMultiplier = 0.75;
-        @Config.Comment("Wither skeletons summoned per wave once the Wither is below half health. 0 = off.")
-        @Config.RangeInt(min = 0, max = 10) public int minionsPerWave = 3;
+        @Config.RangeDouble(min = 0.01, max = 10) public double damageTakenMultiplier = 0.6;
+        @Config.Comment("Wither skeletons summoned per wave (doubled below half health). 0 = off.")
+        @Config.RangeInt(min = 0, max = 10) public int minionsPerWave = 2;
         @Config.Comment("Seconds between minion waves.")
-        @Config.RangeInt(min = 1, max = 600) public int minionIntervalSeconds = 25;
+        @Config.RangeInt(min = 1, max = 600) public int minionIntervalSeconds = 20;
+        @Config.Comment("Seconds between extra volleys of blue (block-breaking) skulls at its target. 0 = off.")
+        @Config.RangeInt(min = 0, max = 600) public int skullVolleyIntervalSeconds = 6;
+        @Config.RangeInt(min = 1, max = 10) public int skullVolleySize = 3;
     }
+
+    @Config.Comment({"Hard mode switches on for the whole world the first time any player enters the Nether.",
+            "It only affects hostile mobs; the Ender Dragon and Wither have their own settings."})
+    public static HardMode hardMode = new HardMode();
+
+    public static class HardMode {
+        public boolean enabled = true;
+        @Config.RangeDouble(min = 1, max = 10) public double mobHealthMultiplier = 1.5;
+        @Config.Comment("Multiplies all damage hostile mobs deal to players (melee, arrows, explosions, fireballs).")
+        @Config.RangeDouble(min = 0, max = 10) public double mobDamageMultiplier = 1.5;
+        @Config.Comment("Multiplies the hostile mob cap, so more mobs are around at once.")
+        @Config.RangeDouble(min = 1, max = 5) public double mobCapMultiplier = 1.5;
+        @Config.Comment("Chance that each natural hostile spawn brings an extra mob with it.")
+        @Config.RangeDouble(min = 0, max = 1) public double extraSpawnChance = 0.5;
+        @Config.Comment("Chance per armor slot that a zombie or skeleton spawns wearing mod armor.")
+        @Config.RangeDouble(min = 0, max = 1) public double armorChance = 0.35;
+        @Config.Comment("Chance that a zombie spawns holding a mod sword or axe.")
+        @Config.RangeDouble(min = 0, max = 1) public double weaponChance = 0.4;
+        @Config.Comment("Chance that each piece of mob gear (and skeleton bows) is enchanted.")
+        @Config.RangeDouble(min = 0, max = 1) public double enchantChance = 0.3;
+    }
+
+    @Config.Comment("Adds plutonium, uranium and a rare neutronium ingot to End City treasure chests.")
+    public static boolean endCityLoot = true;
 
     public static class Progression {
         @Config.Comment("Turn off to leave vanilla harvest levels untouched.")

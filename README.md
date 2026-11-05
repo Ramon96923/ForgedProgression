@@ -68,14 +68,33 @@ like the vanilla bow, take all the usual bow enchantments, and their textures ar
 
 ## Bosses
 
-The Ender Dragon and the Wither are scaled up to keep pace with the new gear:
+The Ender Dragon and the Wither are scaled up well past vanilla to keep pace with the new gear:
 
-| Boss   | Health          | Damage dealt | Damage taken | Extra                                                       |
-|--------|-----------------|--------------|--------------|-------------------------------------------------------------|
-| Dragon | 500 (×2.5)      | ×2           | ×0.75        | Its hits and breath give 4 s of Wither II                   |
-| Wither | 900 (×3)        | ×2           | ×0.75        | Below half health, summons 3 wither skeletons every 25 s    |
+| Boss   | Health          | Damage dealt | Damage taken | Extras |
+|--------|-----------------|--------------|--------------|--------|
+| Dragon | 800 (×4)        | ×3           | ×0.6         | Hits and breath give 6 s of Wither II · lightning strikes near a random player every 15 s · 2 endermen summoned onto a player every 30 s |
+| Wither | 1020 (×3.4)     | ×2.5         | ×0.6         | Extra volley of 3 blue (block-breaking) skulls every 6 s · 2 wither skeletons every 20 s, 4 once below half health |
 
+Minecraft caps health at 1024, so the Wither is about as tanky as health alone can make it.
 All of it can be changed or turned off in the `bosses` config section.
+
+## Hard mode
+
+The first time any player steps into the Nether, the whole world switches to hard mode (with a chat
+announcement). From then on, hostile mobs:
+
+- have **+50% health** and deal **+50% damage** to players (melee, arrows, explosions, fireballs)
+- spawn more: the hostile mob cap is **×1.5**, and each natural spawn has a **50%** chance to bring a second mob
+- zombies and skeletons can spawn in **mod armor** (35% per slot, mostly copper–steel, rarely ruby or uranium),
+  zombies can carry **mod swords and axes** (40%), and gear and skeleton bows are sometimes **enchanted** (30%)
+
+Hard mode is saved with the world and stays on. Bosses aren't affected (they have their own settings).
+Tune or disable it in the `hardMode` config section.
+
+## End City loot
+
+End City treasure chests get an extra 1–3 rolls of: 2–6 plutonium ingots (common), 1–3 uranium ingots,
+or a rare neutronium ingot. Toggle with `endCityLoot`.
 
 ## Config
 
@@ -83,6 +102,11 @@ All of it can be changed or turned off in the `bosses` config section.
 - `progression`: turn gating off, or change the required level of each vanilla ore.
 - `worldgen`: enable/disable, vein size, veins per chunk and height range for each ore.
 - `bosses`: health, damage and extras for the Ender Dragon and Wither.
+- `hardMode`: everything about Nether-triggered hard mode.
+- `endCityLoot`: plutonium in End City chests.
+
+If you already have a config file from an older version, Forge keeps your old values instead of the new defaults.
+Delete `config/forgedprogression.cfg` (or just its `bosses` section) to pick up the new boss numbers.
 
 ## Getting the jar
 
