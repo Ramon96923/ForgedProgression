@@ -47,6 +47,7 @@ public final class RegistryHandler {
         OreDictionary.registerOre("blockRuby", ModBlocks.RUBY_BLOCK);
         OreDictionary.registerOre("blockUranium", ModBlocks.URANIUM_BLOCK);
         OreDictionary.registerOre("blockPlutonium", ModBlocks.PLUTONIUM_BLOCK);
+        OreDictionary.registerOre("blockNeutronium", ModBlocks.NEUTRONIUM_BLOCK);
 
         OreDictionary.registerOre("ingotCopper", ModItems.COPPER_INGOT);
         OreDictionary.registerOre("ingotTin", ModItems.TIN_INGOT);
@@ -55,6 +56,7 @@ public final class RegistryHandler {
         OreDictionary.registerOre("gemRuby", ModItems.RUBY);
         OreDictionary.registerOre("ingotUranium", ModItems.URANIUM_INGOT);
         OreDictionary.registerOre("ingotPlutonium", ModItems.PLUTONIUM_INGOT);
+        OreDictionary.registerOre("ingotNeutronium", ModItems.NEUTRONIUM_INGOT);
     }
 
     private RegistryHandler() {}

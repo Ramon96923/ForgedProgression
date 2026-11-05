@@ -8,6 +8,7 @@ import net.minecraft.util.ResourceLocation;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Recolors a vanilla texture: picks out the "metal" pixels (gray for iron, cyan for diamond,
@@ -15,9 +16,6 @@ import java.io.IOException;
  * Everything else (wooden handles, stone background) is left alone or taken from a background texture.
  */
 public final class Recolor {
-
-    private static final double REFERENCE_PERCENTILE = 0.9;
-    private static final double HIGHLIGHT = 0.4;
 
     public enum Match {
         /** Low-saturation pixels: iron tools, armor, ingots, blocks. Leaves wooden handles alone. */
@@ -28,27 +26,61 @@ public final class Recolor {
         COLORED
     }
 
+    /**
+     * How source brightness maps onto the target color.
+     *
+     * @param percentile   which brightness (as a percentile of the matched pixels) gets exactly the target color
+     * @param highlight    how fast pixels brighter than that blend toward white
+     * @param contrast     exponent on the brightness ratio; above 1 deepens shadows and lifts highlights
+     * @param sparkle      fraction of the brightest source pixels turned into near-white glints (0 = none)
+     * @param sparkleAmount how far those glints are pushed toward white (0..1)
+     */
+    public static final class Shading {
+        /** Tools, ingots, blocks: anchored high so near-white iron keeps its color. */
+        public static final Shading DEFAULT = new Shading(0.9, 0.4, 1.0, 0.0, 0.0);
+        /** Armor icons: a bit more contrast and highlight than tools. */
+        public static final Shading ARMOR_ITEM = new Shading(0.6, 1.2, 1.4, 0.0, 0.0);
+        /** Worn armor: strong contrast plus diamond-style glints, since vanilla iron armor is flat gray. */
+        public static final Shading ARMOR_WORN = new Shading(0.7, 1.5, 2.2, 0.08, 0.85);
+
+        final double percentile, highlight, contrast, sparkle, sparkleAmount;
+
+        public Shading(double percentile, double highlight, double contrast, double sparkle, double sparkleAmount) {
+            this.percentile = percentile;
+            this.highlight = highlight;
+            this.contrast = contrast;
+            this.sparkle = sparkle;
+            this.sparkleAmount = sparkleAmount;
+        }
+    }
+
     public static final class Spec {
         final ResourceLocation source;
         final Match match;
         final int color;
         final ResourceLocation background; // nullable: replaces unmatched pixels (e.g. end stone behind ore spots)
+        final Shading shading;
 
         public Spec(String source, Match match, int color) {
-            this(source, match, color, null);
+            this(source, match, color, null, Shading.DEFAULT);
         }
 
-        public Spec(String source, Match match, int color, String background) {
+        public Spec(String source, Match match, int color, Shading shading) {
+            this(source, match, color, null, shading);
+        }
+
+        public Spec(String source, Match match, int color, String background, Shading shading) {
             this.source = new ResourceLocation(source);
             this.match = match;
             this.color = color;
             this.background = background == null ? null : new ResourceLocation(background);
+            this.shading = shading;
         }
 
         public BufferedImage render(IResourceManager manager) throws IOException {
             BufferedImage src = read(manager, source);
             BufferedImage bg = background == null ? null : read(manager, background);
-            return apply(src, match, color, bg);
+            return apply(src, match, color, bg, shading);
         }
     }
 
@@ -58,14 +90,12 @@ public final class Recolor {
         }
     }
 
-    public static BufferedImage apply(BufferedImage src, Match match, int target, BufferedImage background) {
+    public static BufferedImage apply(BufferedImage src, Match match, int target, BufferedImage background, Shading s) {
         int w = src.getWidth();
         int h = src.getHeight();
         int[] px = src.getRGB(0, 0, w, h, null, 0, w);
         boolean[] hit = new boolean[px.length];
 
-        // Reference brightness = 90th percentile of the matched pixels. Vanilla iron is near-white, so
-        // anchoring the target color high keeps tool heads colored instead of washing out to white.
         double[] lumas = new double[px.length];
         int count = 0;
         float[] hsb = new float[3];
@@ -81,11 +111,15 @@ public final class Recolor {
                 lumas[count++] = luma(r, g, b);
             }
         }
-        double mean = 128;
+        double reference = 128;
+        double sparkleFrom = Double.MAX_VALUE;
         if (count > 0) {
-            double[] sorted = java.util.Arrays.copyOf(lumas, count);
-            java.util.Arrays.sort(sorted);
-            mean = Math.max(1, sorted[Math.min(count - 1, (int) (count * REFERENCE_PERCENTILE))]);
+            double[] sorted = Arrays.copyOf(lumas, count);
+            Arrays.sort(sorted);
+            reference = Math.max(1, sorted[Math.min(count - 1, (int) (count * s.percentile))]);
+            if (s.sparkle > 0) {
+                sparkleFrom = sorted[Math.min(count - 1, (int) (count * (1.0 - s.sparkle)))];
+            }
         }
 
         int tr = (target >> 16) & 0xFF, tg = (target >> 8) & 0xFF, tb = target & 0xFF;
@@ -97,8 +131,18 @@ public final class Recolor {
             int a = px[i] >>> 24;
             if (hit[i]) {
                 int r = (px[i] >> 16) & 0xFF, g = (px[i] >> 8) & 0xFF, b = px[i] & 0xFF;
-                double ratio = luma(r, g, b) / mean;
-                out[i] = (a << 24) | (shade(tr, ratio) << 16) | (shade(tg, ratio) << 8) | shade(tb, ratio);
+                double l = luma(r, g, b);
+                double ratio = l / reference;
+                if (s.contrast != 1.0) {
+                    ratio = Math.pow(ratio, s.contrast);
+                }
+                int nr = shade(tr, ratio, s.highlight), ng = shade(tg, ratio, s.highlight), nb = shade(tb, ratio, s.highlight);
+                if (l >= sparkleFrom) {
+                    nr = toWhite(nr, s.sparkleAmount);
+                    ng = toWhite(ng, s.sparkleAmount);
+                    nb = toWhite(nb, s.sparkleAmount);
+                }
+                out[i] = (a << 24) | (nr << 16) | (ng << 8) | nb;
             } else if (useBg && a != 0) {
                 out[i] = bgPx[i];
             } else {
@@ -124,9 +168,17 @@ public final class Recolor {
         }
     }
 
-    /** Darker than average: scale the target down. Brighter: blend toward white for highlights. */
-    private static int shade(int c, double ratio) {
-        double v = ratio <= 1.0 ? c * ratio : c + (255 - c) * Math.min(1.0, (ratio - 1.0) * HIGHLIGHT);
+    /** Darker than the reference: scale the target down. Brighter: blend toward white. */
+    private static int shade(int c, double ratio, double highlight) {
+        double v = ratio <= 1.0 ? c * ratio : c + (255 - c) * Math.min(1.0, (ratio - 1.0) * highlight);
+        return clamp(v);
+    }
+
+    private static int toWhite(int c, double amount) {
+        return clamp(c + (255 - c) * amount);
+    }
+
+    private static int clamp(double v) {
         return Math.max(0, Math.min(255, (int) Math.round(v)));
     }
 

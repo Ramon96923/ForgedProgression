@@ -16,6 +16,40 @@ public class ModConfig {
     @Config.Comment("Ore generation. Copper, tin, ruby and uranium spawn in the Overworld; plutonium spawns in End stone.")
     public static WorldGen worldgen = new WorldGen();
 
+    @Config.Comment({"Ender Dragon and Wither difficulty, scaled up to match the new gear.", "Minecraft caps max health at 1024, so very high health multipliers stop having an effect."})
+    public static Bosses bosses = new Bosses();
+
+    public static class Bosses {
+        @Config.Comment("Vanilla dragon: 200 health.")
+        public DragonSettings dragon = new DragonSettings();
+        @Config.Comment("Vanilla Wither: 300 health.")
+        public WitherSettings wither = new WitherSettings();
+    }
+
+    public static class DragonSettings {
+        public boolean enabled = true;
+        @Config.RangeDouble(min = 0.1, max = 100) public double healthMultiplier = 2.5;
+        @Config.Comment("Multiplies damage from the dragon's melee, breath and fireballs.")
+        @Config.RangeDouble(min = 0, max = 100) public double damageMultiplier = 2.0;
+        @Config.Comment("Multiplies damage the dragon takes. Below 1 = tankier.")
+        @Config.RangeDouble(min = 0.01, max = 10) public double damageTakenMultiplier = 0.75;
+        @Config.Comment("Seconds of Wither II applied when the dragon hits you. 0 = off.")
+        @Config.RangeInt(min = 0, max = 60) public int witherOnHitSeconds = 4;
+    }
+
+    public static class WitherSettings {
+        public boolean enabled = true;
+        @Config.RangeDouble(min = 0.1, max = 100) public double healthMultiplier = 3.0;
+        @Config.Comment("Multiplies damage from wither skulls.")
+        @Config.RangeDouble(min = 0, max = 100) public double damageMultiplier = 2.0;
+        @Config.Comment("Multiplies damage the Wither takes. Below 1 = tankier.")
+        @Config.RangeDouble(min = 0.01, max = 10) public double damageTakenMultiplier = 0.75;
+        @Config.Comment("Wither skeletons summoned per wave once the Wither is below half health. 0 = off.")
+        @Config.RangeInt(min = 0, max = 10) public int minionsPerWave = 3;
+        @Config.Comment("Seconds between minion waves.")
+        @Config.RangeInt(min = 1, max = 600) public int minionIntervalSeconds = 25;
+    }
+
     public static class Progression {
         @Config.Comment("Turn off to leave vanilla harvest levels untouched.")
         public boolean enabled = true;

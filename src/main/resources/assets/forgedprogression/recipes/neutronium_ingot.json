@@ -1,0 +1,26 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "PUP",
+    "UIU",
+    "PUP"
+  ],
+  "key": {
+    "P": {
+      "type": "forge:ore_dict",
+      "ore": "ingotPlutonium"
+    },
+    "U": {
+      "type": "forge:ore_dict",
+      "ore": "ingotUranium"
+    },
+    "I": {
+      "type": "forge:ore_dict",
+      "ore": "ingotIron"
+    }
+  },
+  "result": {
+    "item": "forgedprogression:neutronium_ingot",
+    "count": 1
+  }
+}

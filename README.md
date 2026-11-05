@@ -1,6 +1,6 @@
 # Forged Progression (Forge 1.12.2)
 
-Adds copper, tin, bronze, steel, ruby, uranium and plutonium, with tools and armor for each
+Adds copper, tin, bronze, steel, ruby, uranium, plutonium and neutronium, with tools and armor for each
 tier, and raises the pickaxe tier needed for vanilla ores so every material is a required step.
 
 ## Progression
@@ -13,7 +13,8 @@ tier, and raises the pickaxe tier needed for vanilla ores so every material is a
 | 3    | **Steel** / Diamond   | Diamond, emerald, **ruby ore**                  |
 | 4    | **Ruby**              | **Uranium ore**                                 |
 | 5    | **Uranium**           | **Plutonium ore** (in the End)                  |
-| 6    | **Plutonium**         | Top tier                                        |
+| 6    | **Plutonium**         | Everything                                      |
+| 7    | **Neutronium**        | Top tier (crafted, no ore)                      |
 
 Stone pickaxes can no longer harvest iron, and iron pickaxes can no longer harvest diamonds.
 
@@ -26,6 +27,7 @@ Stone pickaxes can no longer harvest iron, and iron pickaxes can no longer harve
 - **Ruby ore**: Overworld y 4–24, rare. Drops a ruby directly, like diamond ore (Fortune works).
 - **Uranium ore**: Overworld y 4–18, very rare. Smelt it into uranium ingots.
 - **Plutonium ore**: generates in **End stone**. Smelt it into plutonium ingots.
+- **Neutronium**: craft 4 plutonium (corners) + 4 uranium (sides) + 1 iron (center) into 1 neutronium ingot.
 - Every material has a storage block (9 ↔ 1), usable as a beacon base.
 
 ## Stats
@@ -38,6 +40,7 @@ Stone pickaxes can no longer harvest iron, and iron pickaxes can no longer harve
 | Ruby      | 4       | 1800       | 9.0   | 7.5       | 3 / 8 / 6 / 3                 | 2.5       |
 | Uranium   | 5       | 2600       | 10.0  | 8         | 3 / 9 / 7 / 3                 | 3         |
 | Plutonium | 6       | 3500       | 12.0  | 9         | 4 / 9 / 7 / 4                 | 4         |
+| Neutronium| 7       | 5000       | 14.0  | 10        | 4 / 10 / 8 / 4                | 5         |
 | *Diamond (vanilla)* | 3 | 1561     | 8.0   | 7         | 3 / 8 / 6 / 3                 | 2         |
 
 Tools and armor use vanilla crafting shapes and repair in an anvil with their ingot or gem.
@@ -51,11 +54,23 @@ vanilla one: copper tools are recolored iron tools, ruby gear is recolored diamo
 recolored iron/diamond ore, and plutonium ore puts the spots on End stone. Resource packs that change
 the vanilla iron or diamond textures change these too. The colors live in `client/ClientTextures.java`.
 
+## Bosses
+
+The Ender Dragon and the Wither are scaled up to keep pace with the new gear:
+
+| Boss   | Health          | Damage dealt | Damage taken | Extra                                                       |
+|--------|-----------------|--------------|--------------|-------------------------------------------------------------|
+| Dragon | 500 (×2.5)      | ×2           | ×0.75        | Its hits and breath give 4 s of Wither II                   |
+| Wither | 900 (×3)        | ×2           | ×0.75        | Below half health, summons 3 wither skeletons every 25 s    |
+
+All of it can be changed or turned off in the `bosses` config section.
+
 ## Config
 
 `config/forgedprogression.cfg` (also editable in-game via Mods → Config):
 - `progression`: turn gating off, or change the required level of each vanilla ore.
 - `worldgen`: enable/disable, vein size, veins per chunk and height range for each ore.
+- `bosses`: health, damage and extras for the Ender Dragon and Wither.
 
 ## Getting the jar
 

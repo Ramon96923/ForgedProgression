@@ -29,6 +29,7 @@ public final class ModBlocks {
     public static final Block RUBY_BLOCK      = reg(metal(6.0F, 3), "ruby_block");
     public static final Block URANIUM_BLOCK   = reg(metal(7.0F, 4), "uranium_block");
     public static final Block PLUTONIUM_BLOCK = reg(metal(8.0F, 5), "plutonium_block");
+    public static final Block NEUTRONIUM_BLOCK = reg(metal(10.0F, 6), "neutronium_block");
 
     private static Block metal(float hardness, int level) {
         return new BlockBase(Material.IRON, SoundType.METAL, hardness, hardness * 2, level, true);

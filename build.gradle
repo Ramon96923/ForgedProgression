@@ -10,7 +10,7 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 
-version = '1.1.0'
+version = '1.2.0'
 group = 'com.forgedprogression'
 archivesBaseName = 'forgedprogression-1.12.2'
 

@@ -2,6 +2,7 @@ package com.forgedprogression.client;
 
 import com.forgedprogression.ForgedProgression;
 import com.forgedprogression.client.Recolor.Match;
+import com.forgedprogression.client.Recolor.Shading;
 import com.forgedprogression.client.Recolor.Spec;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -44,11 +45,12 @@ public final class ClientTextures {
     private static final Metal RUBY      = new Metal("ruby",      0xDC283C, true);
     private static final Metal URANIUM   = new Metal("uranium",   0x6EDC3C, false);
     private static final Metal PLUTONIUM = new Metal("plutonium", 0xAA46DC, false);
+    private static final Metal NEUTRONIUM = new Metal("neutronium", 0x34405E, false);
 
-    private static final Metal[] ALL = {COPPER, TIN, BRONZE, STEEL, RUBY, URANIUM, PLUTONIUM};
-    private static final Metal[] GEAR = {COPPER, BRONZE, STEEL, RUBY, URANIUM, PLUTONIUM};
-    private static final String[] PIECES = {"pickaxe", "axe", "shovel", "hoe", "sword",
-            "helmet", "chestplate", "leggings", "boots"};
+    private static final Metal[] ALL = {COPPER, TIN, BRONZE, STEEL, RUBY, URANIUM, PLUTONIUM, NEUTRONIUM};
+    private static final Metal[] GEAR = {COPPER, BRONZE, STEEL, RUBY, URANIUM, PLUTONIUM, NEUTRONIUM};
+    private static final String[] TOOLS = {"pickaxe", "axe", "shovel", "hoe", "sword"};
+    private static final String[] ARMOR = {"helmet", "chestplate", "leggings", "boots"};
 
     private static final String MC = "minecraft:textures/";
 
@@ -67,9 +69,15 @@ public final class ClientTextures {
         map.put(item("steel_blend"), new Spec(MC + "items/gunpowder.png", Match.GRAY, 0x5A606E));
 
         for (Metal m : GEAR) {
-            for (String piece : PIECES) {
+            for (String piece : TOOLS) {
                 map.put(item(m.name + "_" + piece),
                         new Spec(MC + "items/" + m.base() + "_" + piece + ".png", m.match(), m.color));
+            }
+            // diamond-based (ruby) already has white glints, so only iron-based armor gets the extra shine
+            Shading armorIcon = m.gem ? Shading.DEFAULT : Shading.ARMOR_ITEM;
+            for (String piece : ARMOR) {
+                map.put(item(m.name + "_" + piece),
+                        new Spec(MC + "items/" + m.base() + "_" + piece + ".png", m.match(), m.color, armorIcon));
             }
         }
 
@@ -80,7 +88,7 @@ public final class ClientTextures {
         map.put(block("uranium_ore"), new Spec(MC + "blocks/iron_ore.png", Match.COLORED, URANIUM.color));
         // plutonium generates in the End, so its spots sit on end stone
         map.put(block("plutonium_ore"), new Spec(MC + "blocks/iron_ore.png", Match.COLORED, PLUTONIUM.color,
-                MC + "blocks/end_stone.png"));
+                MC + "blocks/end_stone.png", Shading.DEFAULT));
         return map;
     }
 
@@ -101,7 +109,8 @@ public final class ClientTextures {
             for (int layer = 1; layer <= 2; layer++) {
                 ResourceLocation target = new ResourceLocation(ForgedProgression.MODID,
                         "textures/models/armor/" + m.name + "_layer_" + layer + ".png");
-                Spec spec = new Spec(MC + "models/armor/" + m.base() + "_layer_" + layer + ".png", m.match(), m.color);
+                Spec spec = new Spec(MC + "models/armor/" + m.base() + "_layer_" + layer + ".png", m.match(), m.color,
+                        m.gem ? Shading.DEFAULT : Shading.ARMOR_WORN);
                 tm.loadTexture(target, new RecoloredTexture(spec));
             }
         }

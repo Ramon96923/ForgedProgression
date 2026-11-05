@@ -29,6 +29,7 @@ public final class ModItems {
     public static final Item RUBY            = reg(new Item(), "ruby");
     public static final Item URANIUM_INGOT   = reg(new Item(), "uranium_ingot");
     public static final Item PLUTONIUM_INGOT = reg(new Item(), "plutonium_ingot");
+    public static final Item NEUTRONIUM_INGOT = reg(new Item(), "neutronium_ingot");
 
     // tools: material, axe damage, axe speed
     public static final Item BRONZE_PICKAXE;
@@ -40,6 +41,7 @@ public final class ModItems {
         tools("ruby", TOOL_RUBY, 8.5F, -3.0F);
         tools("uranium", TOOL_URANIUM, 9.0F, -3.0F);
         tools("plutonium", TOOL_PLUTONIUM, 10.0F, -2.9F);
+        tools("neutronium", TOOL_NEUTRONIUM, 11.0F, -2.8F);
 
         armor("copper", ARMOR_COPPER);
         armor("bronze", ARMOR_BRONZE);
@@ -47,6 +49,7 @@ public final class ModItems {
         armor("ruby", ARMOR_RUBY);
         armor("uranium", ARMOR_URANIUM);
         armor("plutonium", ARMOR_PLUTONIUM);
+        armor("neutronium", ARMOR_NEUTRONIUM);
 
         // anvil repair materials
         TOOL_COPPER.setRepairItem(new ItemStack(COPPER_INGOT));
@@ -61,6 +64,8 @@ public final class ModItems {
         ARMOR_RUBY.setRepairItem(new ItemStack(RUBY));
         ARMOR_URANIUM.setRepairItem(new ItemStack(URANIUM_INGOT));
         ARMOR_PLUTONIUM.setRepairItem(new ItemStack(PLUTONIUM_INGOT));
+        TOOL_NEUTRONIUM.setRepairItem(new ItemStack(NEUTRONIUM_INGOT));
+        ARMOR_NEUTRONIUM.setRepairItem(new ItemStack(NEUTRONIUM_INGOT));
     }
 
     /** Registers pickaxe, axe, shovel, hoe and sword; returns the pickaxe. */
