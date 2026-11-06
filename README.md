@@ -91,15 +91,20 @@ Hard mode has two stages for the whole world, each announced in chat:
 | | Stage I | Stage II |
 |---|---|---|
 | Starts when | anyone first enters **the Nether** | anyone first enters **the End** |
-| Mob health | +50% | +125% |
-| Mob damage to players | ×1.5 | ×2 |
-| Mob cap | ×1.5 | ×2 |
-| Extra mob with each spawn | 50% | 75% |
-| Zombie/skeleton armor (per slot) | 35%, mostly copper–steel | 60%, mostly steel–uranium, some plutonium |
-| Zombie swords/axes | 40% | 60% |
-| Enchanted gear | 30% | 50% |
-| Permanent Speed | none | 25% of mobs |
-| Charged creepers | none | 15% |
+| Mob health | +50% | **+250%** (×3.5) |
+| Mob damage to players | ×1.5 | **×3** |
+| Mob cap | ×1.5 | **×2.5** |
+| Extra mobs with each spawn | 50% chance of 1 | **1, plus 50% chance of a 2nd** |
+| Zombie/skeleton armor (per slot) | 35%, mostly copper–steel | **85%**, mostly ruby–plutonium, some neutronium |
+| Zombie swords/axes | 40% | **80%** |
+| Enchanted gear | 30%, weak enchants | **75%**, level 15–30 enchants |
+| Permanent Speed | none | **50%** of mobs |
+| Permanent Resistance I | none | **30%** of mobs |
+| Sun-proof (Fire Resistance) | none | **60%** of mobs |
+| Detection range | normal | **×2** |
+| Knockback resistance | none | **50%** |
+| Hits give Slowness/Weakness (3 s) | none | **25%** of hits |
+| Charged creepers | none | **40%** |
 
 Stage II replaces stage I's numbers rather than stacking. Mobs already around when stage II starts get the new
 health but keep their gear. Hard mode is saved with the world and never turns off; bosses aren't affected (they

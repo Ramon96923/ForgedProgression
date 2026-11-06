@@ -69,7 +69,8 @@ public class ModConfig {
         @Config.Comment("Stage I: after entering the Nether.")
         public HardModeStage nether = new HardModeStage(1.5, 1.5, 1.5, 0.5, 0.35, 0.4, 0.3, 0.0, 0.0);
         @Config.Comment("Stage II: after entering the End. Replaces stage I's numbers (they don't stack).")
-        public HardModeStage end = new HardModeStage(2.25, 2.0, 2.0, 0.75, 0.6, 0.6, 0.5, 0.25, 0.15);
+        public HardModeStage end = new HardModeStage(3.5, 3.0, 2.5, 1.5, 0.85, 0.8, 0.75, 0.5, 0.4)
+                .extras(0.3, 0.6, 2.0, 0.5, 0.25);
     }
 
     public static class HardModeStage {
@@ -78,8 +79,9 @@ public class ModConfig {
         @Config.RangeDouble(min = 0, max = 10) public double mobDamageMultiplier;
         @Config.Comment("Multiplies the hostile mob cap, so more mobs are around at once.")
         @Config.RangeDouble(min = 1, max = 5) public double mobCapMultiplier;
-        @Config.Comment("Chance that each natural hostile spawn brings an extra mob with it.")
-        @Config.RangeDouble(min = 0, max = 1) public double extraSpawnChance;
+        @Config.Comment({"Extra mobs that come with each natural hostile spawn. The whole part is guaranteed,",
+                "the fraction is a chance for one more (0.5 = 50% chance of 1 extra, 1.5 = 1 extra plus 50% chance of 2)."})
+        @Config.RangeDouble(min = 0, max = 3) public double extraSpawns;
         @Config.Comment("Chance per armor slot that a zombie or skeleton spawns wearing mod armor.")
         @Config.RangeDouble(min = 0, max = 1) public double armorChance;
         @Config.Comment("Chance that a zombie spawns holding a mod sword or axe.")
@@ -90,18 +92,37 @@ public class ModConfig {
         @Config.RangeDouble(min = 0, max = 1) public double speedChance;
         @Config.Comment("Chance that a creeper spawns charged.")
         @Config.RangeDouble(min = 0, max = 1) public double chargedCreeperChance;
+        @Config.Comment("Chance that a hostile mob spawns with permanent Resistance I.")
+        @Config.RangeDouble(min = 0, max = 1) public double resistanceChance = 0;
+        @Config.Comment("Chance that a hostile mob spawns with permanent Fire Resistance (zombies and skeletons stop burning in daylight).")
+        @Config.RangeDouble(min = 0, max = 1) public double fireResistanceChance = 0;
+        @Config.Comment("Multiplies how far away mobs notice and chase players.")
+        @Config.RangeDouble(min = 1, max = 4) public double followRangeMultiplier = 1;
+        @Config.Comment("Knockback resistance given to every hostile mob (0 = none, 1 = immune).")
+        @Config.RangeDouble(min = 0, max = 1) public double knockbackResistance = 0;
+        @Config.Comment("Chance that a hit from a hostile mob also gives you Slowness or Weakness for a few seconds.")
+        @Config.RangeDouble(min = 0, max = 1) public double debuffOnHitChance = 0;
 
         public HardModeStage(double health, double damage, double cap, double extraSpawn, double armor,
                              double weapon, double enchant, double speed, double chargedCreeper) {
             this.mobHealthMultiplier = health;
             this.mobDamageMultiplier = damage;
             this.mobCapMultiplier = cap;
-            this.extraSpawnChance = extraSpawn;
+            this.extraSpawns = extraSpawn;
             this.armorChance = armor;
             this.weaponChance = weapon;
             this.enchantChance = enchant;
             this.speedChance = speed;
             this.chargedCreeperChance = chargedCreeper;
+        }
+
+        HardModeStage extras(double resistance, double fireResistance, double followRange, double knockback, double debuff) {
+            this.resistanceChance = resistance;
+            this.fireResistanceChance = fireResistance;
+            this.followRangeMultiplier = followRange;
+            this.knockbackResistance = knockback;
+            this.debuffOnHitChance = debuff;
+            return this;
         }
     }
 

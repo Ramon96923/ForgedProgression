@@ -6,6 +6,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -56,6 +57,8 @@ import java.util.UUID;
 public final class HardMode {
 
     private static final UUID HEALTH_ID = UUID.fromString("6f2c8a3e-3b8f-4c41-9d5e-2a7b1c9e4f10");
+    private static final UUID FOLLOW_ID = UUID.fromString("0b5d2c71-8e44-4f0a-a3c6-5d9e7f21b843");
+    private static final UUID KNOCKBACK_ID = UUID.fromString("c4e19a02-6d3b-47f8-9b15-e2a8d0f37c56");
     /** Saved on each mob so a stage's buff is applied once, not again every time the chunk reloads. */
     private static final String[] STAGE_TAGS = {null, ForgedProgression.MODID + ".hardmode", ForgedProgression.MODID + ".hardmode2"};
     private static final int VANILLA_MONSTER_CAP = EnumCreatureType.MONSTER.getMaxNumberOfCreature();
@@ -193,18 +196,23 @@ public final class HardMode {
         EntityLiving mob = (EntityLiving) e;
         ModConfig.HardModeStage cfg = settingsFor(stage);
 
-        IAttributeInstance health = mob.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
-        if (health != null) {
-            float fraction = mob.getMaxHealth() > 0 ? mob.getHealth() / mob.getMaxHealth() : 1.0F;
-            health.removeModifier(HEALTH_ID);
-            // operation 1: +X% of base health
-            health.applyModifier(new AttributeModifier(HEALTH_ID, "Hard mode health", cfg.mobHealthMultiplier - 1.0, 1));
-            mob.setHealth(mob.getMaxHealth() * (newMob ? 1.0F : fraction));
-        }
+        float fraction = mob.getMaxHealth() > 0 ? mob.getHealth() / mob.getMaxHealth() : 1.0F;
+        // operation 1: +X% of base value; operation 0: flat
+        setModifier(mob, SharedMonsterAttributes.MAX_HEALTH, HEALTH_ID, "Hard mode health", cfg.mobHealthMultiplier - 1.0, 1);
+        setModifier(mob, SharedMonsterAttributes.FOLLOW_RANGE, FOLLOW_ID, "Hard mode follow range", cfg.followRangeMultiplier - 1.0, 1);
+        setModifier(mob, SharedMonsterAttributes.KNOCKBACK_RESISTANCE, KNOCKBACK_ID, "Hard mode knockback resistance", cfg.knockbackResistance, 0);
+        mob.setHealth(mob.getMaxHealth() * (newMob ? 1.0F : fraction));
+
         if (newMob) {
             equip(mob, world.rand, stage, cfg);
             if (world.rand.nextDouble() < cfg.speedChance) {
                 mob.addPotionEffect(new PotionEffect(MobEffects.SPEED, Integer.MAX_VALUE, 0, false, false));
+            }
+            if (world.rand.nextDouble() < cfg.resistanceChance) {
+                mob.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, Integer.MAX_VALUE, 0, false, false));
+            }
+            if (world.rand.nextDouble() < cfg.fireResistanceChance) {
+                mob.addPotionEffect(new PotionEffect(MobEffects.FIRE_RESISTANCE, Integer.MAX_VALUE, 0, false, false));
             }
             if (mob instanceof EntityCreeper && world.rand.nextDouble() < cfg.chargedCreeperChance) {
                 // creepers have no setter for "powered", so round-trip it through their saved data
@@ -213,6 +221,18 @@ public final class HardMode {
                 nbt.setBoolean("powered", true);
                 mob.readEntityFromNBT(nbt);
             }
+        }
+    }
+
+    private static void setModifier(EntityLiving mob, net.minecraft.entity.ai.attributes.IAttribute attribute, UUID id,
+                                    String name, double amount, int operation) {
+        IAttributeInstance instance = mob.getEntityAttribute(attribute);
+        if (instance == null) {
+            return;
+        }
+        instance.removeModifier(id);
+        if (amount != 0) {
+            instance.applyModifier(new AttributeModifier(id, name, amount, operation));
         }
     }
 
@@ -225,12 +245,16 @@ public final class HardMode {
         if (attacker instanceof IMob && !(attacker instanceof EntityDragon) && !(attacker instanceof EntityWither)) {
             ModConfig.HardModeStage cfg = settings(attacker.world);
             if (cfg != null) {
+                EntityLivingBase player = event.getEntityLiving();
                 event.setAmount(event.getAmount() * (float) cfg.mobDamageMultiplier);
+                if (player.world.rand.nextDouble() < cfg.debuffOnHitChance) {
+                    player.addPotionEffect(new PotionEffect(player.world.rand.nextBoolean() ? MobEffects.SLOWNESS : MobEffects.WEAKNESS, 60, 0));
+                }
             }
         }
     }
 
-    /** Each natural hostile spawn has a chance to bring a second mob of the same kind with it. */
+    /** Each natural hostile spawn can bring extra mobs of the same kind with it. */
     @SubscribeEvent
     public static void onCheckSpawn(LivingSpawnEvent.CheckSpawn event) {
         World world = event.getWorld();
@@ -239,20 +263,23 @@ public final class HardMode {
             return;
         }
         ModConfig.HardModeStage cfg = settings(world);
-        if (cfg == null || world.rand.nextDouble() >= cfg.extraSpawnChance) {
+        if (cfg == null) {
             return;
         }
-        Entity created = EntityList.newEntity(event.getEntityLiving().getClass(), world);
-        if (!(created instanceof EntityLiving)) {
-            return;
-        }
-        EntityLiving extra = (EntityLiving) created;
-        double x = event.getX() + world.rand.nextInt(3) - 1;
-        double z = event.getZ() + world.rand.nextInt(3) - 1;
-        extra.setLocationAndAngles(x, event.getY(), z, world.rand.nextFloat() * 360F, 0F);
-        if (extra.getCanSpawnHere() && extra.isNotColliding()) {
-            extra.onInitialSpawn(world.getDifficultyForLocation(new BlockPos(extra)), null);
-            world.spawnEntity(extra);
+        int count = (int) cfg.extraSpawns + (world.rand.nextDouble() < cfg.extraSpawns % 1.0 ? 1 : 0);
+        for (int i = 0; i < count; i++) {
+            Entity created = EntityList.newEntity(event.getEntityLiving().getClass(), world);
+            if (!(created instanceof EntityLiving)) {
+                return;
+            }
+            EntityLiving extra = (EntityLiving) created;
+            double x = event.getX() + world.rand.nextInt(3) - 1;
+            double z = event.getZ() + world.rand.nextInt(3) - 1;
+            extra.setLocationAndAngles(x, event.getY(), z, world.rand.nextFloat() * 360F, 0F);
+            if (extra.getCanSpawnHere() && extra.isNotColliding()) {
+                extra.onInitialSpawn(world.getDifficultyForLocation(new BlockPos(extra)), null);
+                world.spawnEntity(extra);
+            }
         }
     }
 
@@ -261,12 +288,12 @@ public final class HardMode {
     private static final EntityEquipmentSlot[] ARMOR_SLOTS = {
             EntityEquipmentSlot.HEAD, EntityEquipmentSlot.CHEST, EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET};
     private static final String[] ARMOR_NAMES = {"helmet", "chestplate", "leggings", "boots"};
-    private static final String[] TIERS = {"copper", "bronze", "steel", "ruby", "uranium", "plutonium"};
-    // gear weights per stage: stage I is mostly early metals, stage II mostly steel to uranium
+    private static final String[] TIERS = {"copper", "bronze", "steel", "ruby", "uranium", "plutonium", "neutronium"};
+    // gear weights per stage: stage I is mostly early metals, stage II mostly ruby to plutonium
     private static final int[][] WEIGHTS = {
             {},
-            {40, 30, 20, 8, 2, 0},
-            {0, 15, 30, 30, 18, 7},
+            {40, 30, 20, 8, 2, 0, 0},
+            {0, 0, 10, 25, 30, 25, 10},
     };
 
     private static void equip(EntityLiving mob, Random rand, int stage, ModConfig.HardModeStage cfg) {
@@ -279,19 +306,19 @@ public final class HardMode {
             if (mob.getItemStackFromSlot(ARMOR_SLOTS[i]).isEmpty() && rand.nextDouble() < cfg.armorChance) {
                 ItemStack piece = modItem(randomTier(rand, stage) + "_" + ARMOR_NAMES[i]);
                 if (!piece.isEmpty()) {
-                    mob.setItemStackToSlot(ARMOR_SLOTS[i], maybeEnchant(piece, rand, cfg));
+                    mob.setItemStackToSlot(ARMOR_SLOTS[i], maybeEnchant(piece, rand, stage, cfg));
                 }
             }
         }
         if (zombie && mob.getHeldItemMainhand().isEmpty() && rand.nextDouble() < cfg.weaponChance) {
             ItemStack weapon = modItem(randomTier(rand, stage) + (rand.nextBoolean() ? "_sword" : "_axe"));
             if (!weapon.isEmpty()) {
-                mob.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, maybeEnchant(weapon, rand, cfg));
+                mob.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, maybeEnchant(weapon, rand, stage, cfg));
             }
         }
         if (skeleton && !mob.getHeldItemMainhand().isEmpty() && !mob.getHeldItemMainhand().isItemEnchanted()) {
             // skeletons keep their vanilla bow (their AI only works with it) but it may be enchanted
-            maybeEnchant(mob.getHeldItemMainhand(), rand, cfg);
+            maybeEnchant(mob.getHeldItemMainhand(), rand, stage, cfg);
         }
     }
 
@@ -316,9 +343,11 @@ public final class HardMode {
         return item == null ? ItemStack.EMPTY : new ItemStack(item);
     }
 
-    private static ItemStack maybeEnchant(ItemStack stack, Random rand, ModConfig.HardModeStage cfg) {
+    private static ItemStack maybeEnchant(ItemStack stack, Random rand, int stage, ModConfig.HardModeStage cfg) {
         if (rand.nextDouble() < cfg.enchantChance) {
-            EnchantmentHelper.addRandomEnchantment(rand, stack, 5 + rand.nextInt(20), false);
+            // stage II enchants like a level 15-30 enchanting table
+            int level = stage == 2 ? 15 + rand.nextInt(16) : 5 + rand.nextInt(20);
+            EnchantmentHelper.addRandomEnchantment(rand, stack, level, false);
         }
         return stack;
     }
