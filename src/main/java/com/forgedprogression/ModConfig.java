@@ -10,10 +10,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class ModConfig {
 
     @Config.Comment({"Harvest-level gating of vanilla ores. Tiers: 0=wood, 1=stone/copper, 2=bronze/iron,",
-            "3=steel/diamond, 4=ruby, 5=uranium, 6=plutonium. Requires restart."})
+            "3=steel/diamond, 4=ruby, 5=uranium, 6=plutonium, 7=neutronium, 8=quasium. Requires restart."})
     public static Progression progression = new Progression();
 
-    @Config.Comment("Ore generation. Copper, tin, ruby and uranium spawn in the Overworld; plutonium spawns in End stone.")
+    @Config.Comment("Ore generation. Copper, tin, ruby and uranium spawn in the Overworld; plutonium and quasium spawn in End stone.")
     public static WorldGen worldgen = new WorldGen();
 
     @Config.Comment({"Ender Dragon and Wither difficulty, scaled up to match the new gear.", "Minecraft caps max health at 1024, so very high health multipliers stop having an effect."})
@@ -59,28 +59,53 @@ public class ModConfig {
         @Config.RangeInt(min = 1, max = 10) public int skullVolleySize = 3;
     }
 
-    @Config.Comment({"Hard mode switches on for the whole world the first time any player enters the Nether.",
-            "It only affects hostile mobs; the Ender Dragon and Wither have their own settings."})
+    @Config.Comment({"Hard mode has two stages for the whole world: stage I starts the first time any player enters",
+            "the Nether, stage II the first time any player enters the End. It only affects hostile mobs;",
+            "the Ender Dragon and Wither have their own settings."})
     public static HardMode hardMode = new HardMode();
 
     public static class HardMode {
         public boolean enabled = true;
-        @Config.RangeDouble(min = 1, max = 10) public double mobHealthMultiplier = 1.5;
-        @Config.Comment("Multiplies all damage hostile mobs deal to players (melee, arrows, explosions, fireballs).")
-        @Config.RangeDouble(min = 0, max = 10) public double mobDamageMultiplier = 1.5;
-        @Config.Comment("Multiplies the hostile mob cap, so more mobs are around at once.")
-        @Config.RangeDouble(min = 1, max = 5) public double mobCapMultiplier = 1.5;
-        @Config.Comment("Chance that each natural hostile spawn brings an extra mob with it.")
-        @Config.RangeDouble(min = 0, max = 1) public double extraSpawnChance = 0.5;
-        @Config.Comment("Chance per armor slot that a zombie or skeleton spawns wearing mod armor.")
-        @Config.RangeDouble(min = 0, max = 1) public double armorChance = 0.35;
-        @Config.Comment("Chance that a zombie spawns holding a mod sword or axe.")
-        @Config.RangeDouble(min = 0, max = 1) public double weaponChance = 0.4;
-        @Config.Comment("Chance that each piece of mob gear (and skeleton bows) is enchanted.")
-        @Config.RangeDouble(min = 0, max = 1) public double enchantChance = 0.3;
+        @Config.Comment("Stage I: after entering the Nether.")
+        public HardModeStage nether = new HardModeStage(1.5, 1.5, 1.5, 0.5, 0.35, 0.4, 0.3, 0.0, 0.0);
+        @Config.Comment("Stage II: after entering the End. Replaces stage I's numbers (they don't stack).")
+        public HardModeStage end = new HardModeStage(2.25, 2.0, 2.0, 0.75, 0.6, 0.6, 0.5, 0.25, 0.15);
     }
 
-    @Config.Comment("Adds plutonium, uranium and a rare neutronium ingot to End City treasure chests.")
+    public static class HardModeStage {
+        @Config.RangeDouble(min = 1, max = 10) public double mobHealthMultiplier;
+        @Config.Comment("Multiplies all damage hostile mobs deal to players (melee, arrows, explosions, fireballs).")
+        @Config.RangeDouble(min = 0, max = 10) public double mobDamageMultiplier;
+        @Config.Comment("Multiplies the hostile mob cap, so more mobs are around at once.")
+        @Config.RangeDouble(min = 1, max = 5) public double mobCapMultiplier;
+        @Config.Comment("Chance that each natural hostile spawn brings an extra mob with it.")
+        @Config.RangeDouble(min = 0, max = 1) public double extraSpawnChance;
+        @Config.Comment("Chance per armor slot that a zombie or skeleton spawns wearing mod armor.")
+        @Config.RangeDouble(min = 0, max = 1) public double armorChance;
+        @Config.Comment("Chance that a zombie spawns holding a mod sword or axe.")
+        @Config.RangeDouble(min = 0, max = 1) public double weaponChance;
+        @Config.Comment("Chance that each piece of mob gear (and skeleton bows) is enchanted.")
+        @Config.RangeDouble(min = 0, max = 1) public double enchantChance;
+        @Config.Comment("Chance that a hostile mob spawns with permanent Speed.")
+        @Config.RangeDouble(min = 0, max = 1) public double speedChance;
+        @Config.Comment("Chance that a creeper spawns charged.")
+        @Config.RangeDouble(min = 0, max = 1) public double chargedCreeperChance;
+
+        public HardModeStage(double health, double damage, double cap, double extraSpawn, double armor,
+                             double weapon, double enchant, double speed, double chargedCreeper) {
+            this.mobHealthMultiplier = health;
+            this.mobDamageMultiplier = damage;
+            this.mobCapMultiplier = cap;
+            this.extraSpawnChance = extraSpawn;
+            this.armorChance = armor;
+            this.weaponChance = weapon;
+            this.enchantChance = enchant;
+            this.speedChance = speed;
+            this.chargedCreeperChance = chargedCreeper;
+        }
+    }
+
+    @Config.Comment("Adds plutonium, uranium and rare neutronium ingots and quasium shards to End City treasure chests.")
     public static boolean endCityLoot = true;
 
     public static class Progression {
@@ -101,6 +126,9 @@ public class ModConfig {
         public OreSettings ruby      = new OreSettings(true, 5, 3, 4, 24);
         public OreSettings uranium   = new OreSettings(true, 4, 2, 4, 18);
         public OreSettings plutonium = new OreSettings(true, 5, 6, 10, 80);
+        public OreSettings quasium   = new OreSettings(true, 4, 3, 10, 80);
+        @Config.Comment("Quasium only generates at least this many blocks from the End's center (the outer islands start around 1000).")
+        @Config.RangeInt(min = 0, max = 100000) public int quasiumMinDistance = 1000;
     }
 
     public static class OreSettings {

@@ -39,6 +39,7 @@ public final class RegistryHandler {
         OreDictionary.registerOre("oreRuby", ModBlocks.RUBY_ORE);
         OreDictionary.registerOre("oreUranium", ModBlocks.URANIUM_ORE);
         OreDictionary.registerOre("orePlutonium", ModBlocks.PLUTONIUM_ORE);
+        OreDictionary.registerOre("oreQuasium", ModBlocks.QUASIUM_ORE);
 
         OreDictionary.registerOre("blockCopper", ModBlocks.COPPER_BLOCK);
         OreDictionary.registerOre("blockTin", ModBlocks.TIN_BLOCK);
@@ -48,6 +49,7 @@ public final class RegistryHandler {
         OreDictionary.registerOre("blockUranium", ModBlocks.URANIUM_BLOCK);
         OreDictionary.registerOre("blockPlutonium", ModBlocks.PLUTONIUM_BLOCK);
         OreDictionary.registerOre("blockNeutronium", ModBlocks.NEUTRONIUM_BLOCK);
+        OreDictionary.registerOre("blockQuasium", ModBlocks.QUASIUM_BLOCK);
 
         OreDictionary.registerOre("ingotCopper", ModItems.COPPER_INGOT);
         OreDictionary.registerOre("ingotTin", ModItems.TIN_INGOT);
@@ -57,6 +59,8 @@ public final class RegistryHandler {
         OreDictionary.registerOre("ingotUranium", ModItems.URANIUM_INGOT);
         OreDictionary.registerOre("ingotPlutonium", ModItems.PLUTONIUM_INGOT);
         OreDictionary.registerOre("ingotNeutronium", ModItems.NEUTRONIUM_INGOT);
+        OreDictionary.registerOre("gemQuasium", ModItems.QUASIUM_SHARD);
+        OreDictionary.registerOre("ingotQuasium", ModItems.QUASIUM_INGOT);
     }
 
     private RegistryHandler() {}

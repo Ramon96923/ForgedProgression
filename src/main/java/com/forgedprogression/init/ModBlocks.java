@@ -20,6 +20,7 @@ public final class ModBlocks {
     public static final Block RUBY_ORE      = reg(new BlockGemOre(4.0F, 3, () -> ModItems.RUBY, 3, 7), "ruby_ore");
     public static final Block URANIUM_ORE   = reg(new BlockBase(Material.ROCK, SoundType.STONE, 5.0F, 8.0F, 4, false), "uranium_ore");
     public static final Block PLUTONIUM_ORE = reg(new BlockBase(Material.ROCK, SoundType.STONE, 6.0F, 12.0F, 5, false), "plutonium_ore");
+    public static final Block QUASIUM_ORE   = reg(new BlockBase(Material.ROCK, SoundType.STONE, 8.0F, 20.0F, 7, false), "quasium_ore");
 
     // storage blocks (beacon bases)
     public static final Block COPPER_BLOCK    = reg(metal(5.0F, 1), "copper_block");
@@ -30,6 +31,7 @@ public final class ModBlocks {
     public static final Block URANIUM_BLOCK   = reg(metal(7.0F, 4), "uranium_block");
     public static final Block PLUTONIUM_BLOCK = reg(metal(8.0F, 5), "plutonium_block");
     public static final Block NEUTRONIUM_BLOCK = reg(metal(10.0F, 6), "neutronium_block");
+    public static final Block QUASIUM_BLOCK = reg(metal(12.0F, 7), "quasium_block");
 
     private static Block metal(float hardness, int level) {
         return new BlockBase(Material.IRON, SoundType.METAL, hardness, hardness * 2, level, true);

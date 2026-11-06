@@ -46,9 +46,10 @@ public final class ClientTextures {
     private static final Metal URANIUM   = new Metal("uranium",   0x6EDC3C, false);
     private static final Metal PLUTONIUM = new Metal("plutonium", 0xAA46DC, false);
     private static final Metal NEUTRONIUM = new Metal("neutronium", 0x34405E, false);
+    private static final Metal QUASIUM = new Metal("quasium", 0xF0389B, false);
 
-    private static final Metal[] ALL = {COPPER, TIN, BRONZE, STEEL, RUBY, URANIUM, PLUTONIUM, NEUTRONIUM};
-    private static final Metal[] GEAR = {COPPER, BRONZE, STEEL, RUBY, URANIUM, PLUTONIUM, NEUTRONIUM};
+    private static final Metal[] ALL = {COPPER, TIN, BRONZE, STEEL, RUBY, URANIUM, PLUTONIUM, NEUTRONIUM, QUASIUM};
+    private static final Metal[] GEAR = {COPPER, BRONZE, STEEL, RUBY, URANIUM, PLUTONIUM, NEUTRONIUM, QUASIUM};
     private static final String[] TOOLS = {"pickaxe", "axe", "shovel", "hoe", "sword"};
     private static final String[] ARMOR = {"helmet", "chestplate", "leggings", "boots"};
 
@@ -67,6 +68,7 @@ public final class ClientTextures {
             map.put(block(m.name + "_block"), new Spec(MC + "blocks/" + m.base() + "_block.png", m.match(), m.color));
         }
         map.put(item("steel_blend"), new Spec(MC + "items/gunpowder.png", Match.GRAY, 0x5A606E));
+        map.put(item("quasium_shard"), new Spec(MC + "items/quartz.png", Match.GRAY, QUASIUM.color));
 
         for (Metal m : GEAR) {
             for (String piece : TOOLS) {
@@ -93,6 +95,9 @@ public final class ClientTextures {
         map.put(block("uranium_ore"), new Spec(MC + "blocks/iron_ore.png", Match.COLORED, URANIUM.color));
         // plutonium generates in the End, so its spots sit on end stone
         map.put(block("plutonium_ore"), new Spec(MC + "blocks/iron_ore.png", Match.COLORED, PLUTONIUM.color,
+                MC + "blocks/end_stone.png", Shading.DEFAULT));
+        // quasium also generates in the End; diamond-ore spots so it doesn't look like plutonium
+        map.put(block("quasium_ore"), new Spec(MC + "blocks/diamond_ore.png", Match.COLORED, QUASIUM.color,
                 MC + "blocks/end_stone.png", Shading.DEFAULT));
         return map;
     }

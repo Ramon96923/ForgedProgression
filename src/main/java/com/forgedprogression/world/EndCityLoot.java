@@ -17,7 +17,7 @@ import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-/** Adds an extra pool to End City treasure chests: plutonium, some uranium, and a rare neutronium ingot. */
+/** Adds an extra pool to End City treasure chests: plutonium, some uranium, and rare neutronium and quasium. */
 @Mod.EventBusSubscriber(modid = ForgedProgression.MODID)
 public final class EndCityLoot {
 
@@ -32,6 +32,7 @@ public final class EndCityLoot {
                 item(ModItems.PLUTONIUM_INGOT, 10, 2, 6, "plutonium_ingot"),
                 item(ModItems.URANIUM_INGOT, 5, 1, 3, "uranium_ingot"),
                 item(ModItems.NEUTRONIUM_INGOT, 1, 1, 1, "neutronium_ingot"),
+                item(ModItems.QUASIUM_SHARD, 2, 1, 2, "quasium_shard"),
                 new LootEntryEmpty(4, 0, NONE, ForgedProgression.MODID + ":nothing"),
         };
         // 1 to 3 rolls per chest

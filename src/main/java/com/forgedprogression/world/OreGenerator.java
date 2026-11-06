@@ -33,6 +33,10 @@ public class OreGenerator implements IWorldGenerator {
                 break;
             case 1: // The End
                 spawn(ModBlocks.PLUTONIUM_ORE, Blocks.END_STONE, cfg.plutonium, world, random, x, z);
+                // quasium only on the outer islands, so you need to beat the dragon and go through a gateway first
+                if ((long) x * x + (long) z * z > (long) cfg.quasiumMinDistance * cfg.quasiumMinDistance) {
+                    spawn(ModBlocks.QUASIUM_ORE, Blocks.END_STONE, cfg.quasium, world, random, x, z);
+                }
                 break;
             default:
                 break;

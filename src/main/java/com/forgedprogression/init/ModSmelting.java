@@ -12,6 +12,7 @@ public final class ModSmelting {
         GameRegistry.addSmelting(ModBlocks.RUBY_ORE, new ItemStack(ModItems.RUBY), 1.0F);
         GameRegistry.addSmelting(ModBlocks.URANIUM_ORE, new ItemStack(ModItems.URANIUM_INGOT), 1.2F);
         GameRegistry.addSmelting(ModBlocks.PLUTONIUM_ORE, new ItemStack(ModItems.PLUTONIUM_INGOT), 1.5F);
+        GameRegistry.addSmelting(ModBlocks.QUASIUM_ORE, new ItemStack(ModItems.QUASIUM_SHARD), 2.0F);
     }
 
     private ModSmelting() {}

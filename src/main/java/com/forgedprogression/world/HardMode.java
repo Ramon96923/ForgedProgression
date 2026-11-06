@@ -13,15 +13,18 @@ import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.boss.EntityDragon;
 import net.minecraft.entity.boss.EntityWither;
 import net.minecraft.entity.monster.AbstractSkeleton;
+import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.MobEffects;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
@@ -44,24 +47,25 @@ import java.util.Random;
 import java.util.UUID;
 
 /**
- * Hard mode: switches on for the whole world the first time any player enters the Nether.
- * Hostile mobs then get more health, hit harder, spawn more often, and zombies/skeletons
- * can spawn wearing (sometimes enchanted) mod armor and wielding mod weapons.
+ * Two-stage hard mode for the whole world: stage I the first time any player enters the Nether,
+ * stage II the first time any player enters the End. Hostile mobs get more health, hit harder,
+ * spawn more often, and zombies/skeletons can spawn wearing (sometimes enchanted) mod armor and
+ * wielding mod weapons. Stage II also adds fast mobs and charged creepers.
  */
 @Mod.EventBusSubscriber(modid = ForgedProgression.MODID)
 public final class HardMode {
 
     private static final UUID HEALTH_ID = UUID.fromString("6f2c8a3e-3b8f-4c41-9d5e-2a7b1c9e4f10");
-    /** Saved on each mob so its buff is applied once, not again every time the chunk reloads. */
-    private static final String TAG = ForgedProgression.MODID + ".hardmode";
+    /** Saved on each mob so a stage's buff is applied once, not again every time the chunk reloads. */
+    private static final String[] STAGE_TAGS = {null, ForgedProgression.MODID + ".hardmode", ForgedProgression.MODID + ".hardmode2"};
     private static final int VANILLA_MONSTER_CAP = EnumCreatureType.MONSTER.getMaxNumberOfCreature();
 
     // ---------------------------------------------------------------- saved state
 
-    /** Per-world flag, saved in data/forgedprogression_hardmode.dat. */
+    /** Per-world stage (0 = off, 1 = Nether, 2 = End), saved in data/forgedprogression_hardmode.dat. */
     public static class Data extends WorldSavedData {
         public static final String NAME = ForgedProgression.MODID + "_hardmode";
-        public boolean active;
+        public int stage;
 
         public Data() {
             super(NAME);
@@ -73,12 +77,14 @@ public final class HardMode {
 
         @Override
         public void readFromNBT(NBTTagCompound nbt) {
-            active = nbt.getBoolean("active");
+            // worlds from 1.4.0 only saved "active"
+            stage = nbt.hasKey("stage") ? nbt.getInteger("stage") : (nbt.getBoolean("active") ? 1 : 0);
         }
 
         @Override
         public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-            nbt.setBoolean("active", active);
+            nbt.setInteger("stage", stage);
+            nbt.setBoolean("active", stage > 0);
             return nbt;
         }
     }
@@ -93,8 +99,18 @@ public final class HardMode {
         return d;
     }
 
-    public static boolean isActive(World world) {
-        return ModConfig.hardMode.enabled && data(world).active;
+    /** Current stage number, 0 when hard mode is off. */
+    public static int stage(World world) {
+        return ModConfig.hardMode.enabled ? Math.max(0, Math.min(2, data(world).stage)) : 0;
+    }
+
+    /** Settings for the current stage, or null when hard mode is off. */
+    public static ModConfig.HardModeStage settings(World world) {
+        return settingsFor(stage(world));
+    }
+
+    private static ModConfig.HardModeStage settingsFor(int stage) {
+        return stage == 2 ? ModConfig.hardMode.end : stage == 1 ? ModConfig.hardMode.nether : null;
     }
 
     // ---------------------------------------------------------------- activation
@@ -102,29 +118,35 @@ public final class HardMode {
     @SubscribeEvent
     public static void onChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
         World world = event.player.world;
-        if (world.isRemote || event.toDim != -1 || !ModConfig.hardMode.enabled) {
+        int reached = event.toDim == -1 ? 1 : event.toDim == 1 ? 2 : 0;
+        if (world.isRemote || reached == 0 || !ModConfig.hardMode.enabled) {
             return;
         }
         Data d = data(world);
-        if (d.active) {
+        if (d.stage >= reached) {
             return;
         }
-        d.active = true;
+        d.stage = reached;
         d.markDirty();
-        applyMobCap(true);
-        announce(world.getMinecraftServer());
+        applyMobCap(settingsFor(reached));
+        announce(world.getMinecraftServer(), reached);
     }
 
-    private static void announce(MinecraftServer server) {
+    private static void announce(MinecraftServer server, int stage) {
         if (server == null) {
             return;
         }
-        TextComponentString msg = new TextComponentString("The Nether has been opened. Hard mode is now active: "
-                + "monsters are stronger, better armed and more numerous.");
-        msg.getStyle().setColor(TextFormatting.DARK_RED).setBold(true);
+        TextComponentString msg = stage == 2
+                ? new TextComponentString("The End has been reached. Hard mode II is now active: "
+                        + "monsters are far stronger, heavily armed, faster, and creepers may be charged.")
+                : new TextComponentString("The Nether has been opened. Hard mode is now active: "
+                        + "monsters are stronger, better armed and more numerous.");
+        msg.getStyle().setColor(stage == 2 ? TextFormatting.DARK_PURPLE : TextFormatting.DARK_RED).setBold(true);
         server.getPlayerList().sendMessage(msg);
         for (EntityPlayerMP p : server.getPlayerList().getPlayers()) {
-            p.world.playSound(null, p.posX, p.posY, p.posZ, SoundEvents.ENTITY_WITHER_SPAWN, SoundCategory.HOSTILE, 0.6F, 0.7F);
+            p.world.playSound(null, p.posX, p.posY, p.posZ,
+                    stage == 2 ? SoundEvents.ENTITY_ENDERDRAGON_GROWL : SoundEvents.ENTITY_WITHER_SPAWN,
+                    SoundCategory.HOSTILE, 0.6F, 0.7F);
         }
     }
 
@@ -133,7 +155,7 @@ public final class HardMode {
     public static void onWorldLoad(WorldEvent.Load event) {
         World world = event.getWorld();
         if (!world.isRemote && world.provider.getDimension() == 0) {
-            applyMobCap(isActive(world));
+            applyMobCap(settings(world));
         }
     }
 
@@ -141,8 +163,8 @@ public final class HardMode {
      * The hostile mob cap is a final field on the vanilla enum with no API to change it, so set it by reflection.
      * If that ever fails (e.g. another mod changed it), hard mode still works through the extra-spawn chance.
      */
-    private static void applyMobCap(boolean active) {
-        int cap = active ? (int) Math.round(VANILLA_MONSTER_CAP * ModConfig.hardMode.mobCapMultiplier) : VANILLA_MONSTER_CAP;
+    private static void applyMobCap(ModConfig.HardModeStage stage) {
+        int cap = stage != null ? (int) Math.round(VANILLA_MONSTER_CAP * stage.mobCapMultiplier) : VANILLA_MONSTER_CAP;
         try {
             ObfuscationReflectionHelper.setPrivateValue(EnumCreatureType.class, EnumCreatureType.MONSTER, cap,
                     "field_75606_e", "maxNumberOfCreature");
@@ -158,21 +180,40 @@ public final class HardMode {
         Entity e = event.getEntity();
         World world = event.getWorld();
         if (world.isRemote || !(e instanceof EntityLiving) || !(e instanceof IMob)
-                || e instanceof EntityDragon || e instanceof EntityWither
-                || e.getTags().contains(TAG) || !isActive(world)) {
+                || e instanceof EntityDragon || e instanceof EntityWither) {
             return;
         }
-        e.addTag(TAG);
+        int stage = stage(world);
+        if (stage == 0 || e.getTags().contains(STAGE_TAGS[stage])) {
+            return;
+        }
+        // mobs that already got stage I keep their gear, but their health is raised to stage II
+        boolean newMob = !e.getTags().contains(STAGE_TAGS[1]) && !e.getTags().contains(STAGE_TAGS[2]);
+        e.addTag(STAGE_TAGS[stage]);
         EntityLiving mob = (EntityLiving) e;
+        ModConfig.HardModeStage cfg = settingsFor(stage);
 
         IAttributeInstance health = mob.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
-        if (health != null && health.getModifier(HEALTH_ID) == null) {
+        if (health != null) {
+            float fraction = mob.getMaxHealth() > 0 ? mob.getHealth() / mob.getMaxHealth() : 1.0F;
+            health.removeModifier(HEALTH_ID);
             // operation 1: +X% of base health
-            health.applyModifier(new AttributeModifier(HEALTH_ID, "Hard mode health",
-                    ModConfig.hardMode.mobHealthMultiplier - 1.0, 1));
-            mob.setHealth(mob.getMaxHealth());
+            health.applyModifier(new AttributeModifier(HEALTH_ID, "Hard mode health", cfg.mobHealthMultiplier - 1.0, 1));
+            mob.setHealth(mob.getMaxHealth() * (newMob ? 1.0F : fraction));
         }
-        equip(mob, world.rand);
+        if (newMob) {
+            equip(mob, world.rand, stage, cfg);
+            if (world.rand.nextDouble() < cfg.speedChance) {
+                mob.addPotionEffect(new PotionEffect(MobEffects.SPEED, Integer.MAX_VALUE, 0, false, false));
+            }
+            if (mob instanceof EntityCreeper && world.rand.nextDouble() < cfg.chargedCreeperChance) {
+                // creepers have no setter for "powered", so round-trip it through their saved data
+                NBTTagCompound nbt = new NBTTagCompound();
+                mob.writeEntityToNBT(nbt);
+                nbt.setBoolean("powered", true);
+                mob.readEntityFromNBT(nbt);
+            }
+        }
     }
 
     @SubscribeEvent
@@ -181,9 +222,11 @@ public final class HardMode {
             return;
         }
         Entity attacker = event.getSource().getTrueSource();
-        if (attacker instanceof IMob && !(attacker instanceof EntityDragon) && !(attacker instanceof EntityWither)
-                && isActive(attacker.world)) {
-            event.setAmount(event.getAmount() * (float) ModConfig.hardMode.mobDamageMultiplier);
+        if (attacker instanceof IMob && !(attacker instanceof EntityDragon) && !(attacker instanceof EntityWither)) {
+            ModConfig.HardModeStage cfg = settings(attacker.world);
+            if (cfg != null) {
+                event.setAmount(event.getAmount() * (float) cfg.mobDamageMultiplier);
+            }
         }
     }
 
@@ -192,8 +235,11 @@ public final class HardMode {
     public static void onCheckSpawn(LivingSpawnEvent.CheckSpawn event) {
         World world = event.getWorld();
         if (world.isRemote || event.isSpawner() || event.getResult() == Event.Result.DENY
-                || !(event.getEntityLiving() instanceof EntityLiving) || !(event.getEntityLiving() instanceof IMob)
-                || !isActive(world) || world.rand.nextDouble() >= ModConfig.hardMode.extraSpawnChance) {
+                || !(event.getEntityLiving() instanceof EntityLiving) || !(event.getEntityLiving() instanceof IMob)) {
+            return;
+        }
+        ModConfig.HardModeStage cfg = settings(world);
+        if (cfg == null || world.rand.nextDouble() >= cfg.extraSpawnChance) {
             return;
         }
         Entity created = EntityList.newEntity(event.getEntityLiving().getClass(), world);
@@ -215,45 +261,49 @@ public final class HardMode {
     private static final EntityEquipmentSlot[] ARMOR_SLOTS = {
             EntityEquipmentSlot.HEAD, EntityEquipmentSlot.CHEST, EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET};
     private static final String[] ARMOR_NAMES = {"helmet", "chestplate", "leggings", "boots"};
-    // tier and weight: mostly early metals, occasionally something nasty
-    private static final String[] TIERS = {"copper", "bronze", "steel", "ruby", "uranium"};
-    private static final int[] WEIGHTS = {40, 30, 20, 8, 2};
+    private static final String[] TIERS = {"copper", "bronze", "steel", "ruby", "uranium", "plutonium"};
+    // gear weights per stage: stage I is mostly early metals, stage II mostly steel to uranium
+    private static final int[][] WEIGHTS = {
+            {},
+            {40, 30, 20, 8, 2, 0},
+            {0, 15, 30, 30, 18, 7},
+    };
 
-    private static void equip(EntityLiving mob, Random rand) {
+    private static void equip(EntityLiving mob, Random rand, int stage, ModConfig.HardModeStage cfg) {
         boolean zombie = mob instanceof EntityZombie;
         boolean skeleton = mob instanceof AbstractSkeleton;
         if (!zombie && !skeleton) {
             return;
         }
-        ModConfig.HardMode cfg = ModConfig.hardMode;
         for (int i = 0; i < ARMOR_SLOTS.length; i++) {
             if (mob.getItemStackFromSlot(ARMOR_SLOTS[i]).isEmpty() && rand.nextDouble() < cfg.armorChance) {
-                ItemStack piece = modItem(randomTier(rand) + "_" + ARMOR_NAMES[i]);
+                ItemStack piece = modItem(randomTier(rand, stage) + "_" + ARMOR_NAMES[i]);
                 if (!piece.isEmpty()) {
-                    mob.setItemStackToSlot(ARMOR_SLOTS[i], maybeEnchant(piece, rand));
+                    mob.setItemStackToSlot(ARMOR_SLOTS[i], maybeEnchant(piece, rand, cfg));
                 }
             }
         }
         if (zombie && mob.getHeldItemMainhand().isEmpty() && rand.nextDouble() < cfg.weaponChance) {
-            ItemStack weapon = modItem(randomTier(rand) + (rand.nextBoolean() ? "_sword" : "_axe"));
+            ItemStack weapon = modItem(randomTier(rand, stage) + (rand.nextBoolean() ? "_sword" : "_axe"));
             if (!weapon.isEmpty()) {
-                mob.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, maybeEnchant(weapon, rand));
+                mob.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, maybeEnchant(weapon, rand, cfg));
             }
         }
         if (skeleton && !mob.getHeldItemMainhand().isEmpty() && !mob.getHeldItemMainhand().isItemEnchanted()) {
             // skeletons keep their vanilla bow (their AI only works with it) but it may be enchanted
-            maybeEnchant(mob.getHeldItemMainhand(), rand);
+            maybeEnchant(mob.getHeldItemMainhand(), rand, cfg);
         }
     }
 
-    private static String randomTier(Random rand) {
+    private static String randomTier(Random rand, int stage) {
+        int[] weights = WEIGHTS[stage];
         int total = 0;
-        for (int w : WEIGHTS) {
+        for (int w : weights) {
             total += w;
         }
         int r = rand.nextInt(total);
         for (int i = 0; i < TIERS.length; i++) {
-            r -= WEIGHTS[i];
+            r -= weights[i];
             if (r < 0) {
                 return TIERS[i];
             }
@@ -266,8 +316,8 @@ public final class HardMode {
         return item == null ? ItemStack.EMPTY : new ItemStack(item);
     }
 
-    private static ItemStack maybeEnchant(ItemStack stack, Random rand) {
-        if (rand.nextDouble() < ModConfig.hardMode.enchantChance) {
+    private static ItemStack maybeEnchant(ItemStack stack, Random rand, ModConfig.HardModeStage cfg) {
+        if (rand.nextDouble() < cfg.enchantChance) {
             EnchantmentHelper.addRandomEnchantment(rand, stack, 5 + rand.nextInt(20), false);
         }
         return stack;

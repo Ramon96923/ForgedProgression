@@ -1,0 +1,25 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "QNQ",
+    "NCN",
+    "QNQ"
+  ],
+  "key": {
+    "Q": {
+      "type": "forge:ore_dict",
+      "ore": "gemQuasium"
+    },
+    "N": {
+      "type": "forge:ore_dict",
+      "ore": "ingotNeutronium"
+    },
+    "C": {
+      "item": "minecraft:end_crystal"
+    }
+  },
+  "result": {
+    "item": "forgedprogression:quasium_ingot",
+    "count": 1
+  }
+}

@@ -1,6 +1,6 @@
 # Forged Progression (Forge 1.12.2)
 
-Adds copper, tin, bronze, steel, ruby, uranium, plutonium and neutronium, with tools and armor for each
+Adds copper, tin, bronze, steel, ruby, uranium, plutonium, neutronium and quasium, with tools and armor for each
 tier, and raises the pickaxe tier needed for vanilla ores so every material is a required step.
 
 ## Progression
@@ -14,7 +14,8 @@ tier, and raises the pickaxe tier needed for vanilla ores so every material is a
 | 4    | **Ruby**              | **Uranium ore**                                 |
 | 5    | **Uranium**           | **Plutonium ore** (in the End)                  |
 | 6    | **Plutonium**         | Everything                                      |
-| 7    | **Neutronium**        | Top tier (crafted, no ore)                      |
+| 7    | **Neutronium**        | **Quasium ore** (outer End islands)             |
+| 8    | **Quasium**           | Top tier                                        |
 
 Stone pickaxes can no longer harvest iron, and iron pickaxes can no longer harvest diamonds.
 
@@ -28,6 +29,10 @@ Stone pickaxes can no longer harvest iron, and iron pickaxes can no longer harve
 - **Uranium ore**: Overworld y 4–18, very rare. Smelt it into uranium ingots.
 - **Plutonium ore**: generates in **End stone**. Smelt it into plutonium ingots.
 - **Neutronium**: craft 4 plutonium (corners) + 4 uranium (sides) + 1 iron (center) into 1 neutronium ingot.
+- **Quasium ore**: only in End stone on the **outer End islands** (1000+ blocks from the center, past the
+  gateway), rare. Needs a neutronium pickaxe. Smelt it into quasium shards.
+- **Quasium ingot**: 4 quasium shards (corners) + 4 neutronium ingots (sides) + 1 end crystal (center).
+  That's 16 plutonium, 16 uranium and an end crystal per ingot.
 - Every material has a storage block (9 ↔ 1), usable as a beacon base.
 
 ## Stats
@@ -41,6 +46,7 @@ Stone pickaxes can no longer harvest iron, and iron pickaxes can no longer harve
 | Uranium   | 5       | 2600       | 10.0  | 8         | 3 / 9 / 7 / 3                 | 3         |
 | Plutonium | 6       | 3500       | 12.0  | 9         | 4 / 9 / 7 / 4                 | 4         |
 | Neutronium| 7       | 5000       | 14.0  | 10        | 4 / 10 / 8 / 4                | 5         |
+| Quasium   | 8       | 7000       | 16.0  | 11.5      | 5 / 11 / 9 / 5 (30, the max)  | 7         |
 | *Diamond (vanilla)* | 3 | 1561     | 8.0   | 7         | 3 / 8 / 6 / 3                 | 2         |
 
 Tools and armor use vanilla crafting shapes and repair in an anvil with their ingot or gem.
@@ -80,21 +86,29 @@ All of it can be changed or turned off in the `bosses` config section.
 
 ## Hard mode
 
-The first time any player steps into the Nether, the whole world switches to hard mode (with a chat
-announcement). From then on, hostile mobs:
+Hard mode has two stages for the whole world, each announced in chat:
 
-- have **+50% health** and deal **+50% damage** to players (melee, arrows, explosions, fireballs)
-- spawn more: the hostile mob cap is **×1.5**, and each natural spawn has a **50%** chance to bring a second mob
-- zombies and skeletons can spawn in **mod armor** (35% per slot, mostly copper–steel, rarely ruby or uranium),
-  zombies can carry **mod swords and axes** (40%), and gear and skeleton bows are sometimes **enchanted** (30%)
+| | Stage I | Stage II |
+|---|---|---|
+| Starts when | anyone first enters **the Nether** | anyone first enters **the End** |
+| Mob health | +50% | +125% |
+| Mob damage to players | ×1.5 | ×2 |
+| Mob cap | ×1.5 | ×2 |
+| Extra mob with each spawn | 50% | 75% |
+| Zombie/skeleton armor (per slot) | 35%, mostly copper–steel | 60%, mostly steel–uranium, some plutonium |
+| Zombie swords/axes | 40% | 60% |
+| Enchanted gear | 30% | 50% |
+| Permanent Speed | none | 25% of mobs |
+| Charged creepers | none | 15% |
 
-Hard mode is saved with the world and stays on. Bosses aren't affected (they have their own settings).
-Tune or disable it in the `hardMode` config section.
+Stage II replaces stage I's numbers rather than stacking. Mobs already around when stage II starts get the new
+health but keep their gear. Hard mode is saved with the world and never turns off; bosses aren't affected (they
+have their own settings). Tune or disable each stage in the `hardMode` config section.
 
 ## End City loot
 
 End City treasure chests get an extra 1–3 rolls of: 2–6 plutonium ingots (common), 1–3 uranium ingots,
-or a rare neutronium ingot. Toggle with `endCityLoot`.
+a rare neutronium ingot, or 1–2 quasium shards (rare). Toggle with `endCityLoot`.
 
 ## Config
 

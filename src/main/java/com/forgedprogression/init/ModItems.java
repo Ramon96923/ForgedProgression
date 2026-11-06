@@ -31,6 +31,8 @@ public final class ModItems {
     public static final Item URANIUM_INGOT   = reg(new Item(), "uranium_ingot");
     public static final Item PLUTONIUM_INGOT = reg(new Item(), "plutonium_ingot");
     public static final Item NEUTRONIUM_INGOT = reg(new Item(), "neutronium_ingot");
+    public static final Item QUASIUM_SHARD = reg(new Item(), "quasium_shard");
+    public static final Item QUASIUM_INGOT = reg(new Item(), "quasium_ingot");
 
     // bows: durability, draw ticks, arrow speed ×, arrow damage ×, bonus knockback, enchantability, repair material
     // (vanilla bow: 384 durability, 20 tick draw)
@@ -49,6 +51,7 @@ public final class ModItems {
         tools("uranium", TOOL_URANIUM, 9.0F, -3.0F);
         tools("plutonium", TOOL_PLUTONIUM, 10.0F, -2.9F);
         tools("neutronium", TOOL_NEUTRONIUM, 11.0F, -2.8F);
+        tools("quasium", TOOL_QUASIUM, 12.5F, -2.7F);
 
         armor("copper", ARMOR_COPPER);
         armor("bronze", ARMOR_BRONZE);
@@ -57,6 +60,7 @@ public final class ModItems {
         armor("uranium", ARMOR_URANIUM);
         armor("plutonium", ARMOR_PLUTONIUM);
         armor("neutronium", ARMOR_NEUTRONIUM);
+        armor("quasium", ARMOR_QUASIUM);
 
         // anvil repair materials
         TOOL_COPPER.setRepairItem(new ItemStack(COPPER_INGOT));
@@ -73,6 +77,8 @@ public final class ModItems {
         ARMOR_PLUTONIUM.setRepairItem(new ItemStack(PLUTONIUM_INGOT));
         TOOL_NEUTRONIUM.setRepairItem(new ItemStack(NEUTRONIUM_INGOT));
         ARMOR_NEUTRONIUM.setRepairItem(new ItemStack(NEUTRONIUM_INGOT));
+        TOOL_QUASIUM.setRepairItem(new ItemStack(QUASIUM_INGOT));
+        ARMOR_QUASIUM.setRepairItem(new ItemStack(QUASIUM_INGOT));
     }
 
     /** Registers pickaxe, axe, shovel, hoe and sword; returns the pickaxe. */
