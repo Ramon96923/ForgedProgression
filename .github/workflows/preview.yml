@@ -35,4 +35,8 @@ jobs:
           echo "::notice title=done::$(grep -m1 'Done (' server.log | cut -c1-300)"
           echo "::notice title=modloaded::$(grep -m3 -i 'forgedprogression\|Forged Progression' server.log | cut -c1-300 | tr '\n' '|')"
           echo "::notice title=errors::$(grep -iE 'ERROR|Exception|Caused by' server.log | grep -viE 'Unable to download|realms|Could not find any|eula' | head -15 | cut -c1-250 | tr '\n' '|')"
+          tail -60 server.log | cut -c1-220 > tail.txt
+          split -l 12 tail.txt part_
+          for f in part_*; do echo "::notice title=tail-$f::$(tr '\n' '|' < $f)"; done
+          echo "::notice title=crash::$(grep -n -iE 'unexpected exception|crash|Failed to start|FATAL' server.log | head -5 | cut -c1-250 | tr '\n' '|')"
           echo "::notice title=hardmode::$(grep -iE 'mob cap|hard mode' server.log | head -3 | cut -c1-250 | tr '\n' '|')"
