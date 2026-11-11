@@ -111,3 +111,5 @@ item.forgedprogression.borealium_helmet.name=Borealium Helmet
 item.forgedprogression.borealium_chestplate.name=Borealium Chestplate
 item.forgedprogression.borealium_leggings.name=Borealium Leggings
 item.forgedprogression.borealium_boots.name=Borealium Boots
+tile.forgedprogression.singularity_compressor.name=Singularity Compressor
+container.forgedprogression.singularity_compressor=Singularity Compressor

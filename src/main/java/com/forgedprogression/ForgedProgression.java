@@ -1,5 +1,6 @@
 package com.forgedprogression;
 
+import com.forgedprogression.compressor.GuiHandler;
 import com.forgedprogression.init.ModItems;
 import com.forgedprogression.init.ModSmelting;
 import com.forgedprogression.init.Progression;
@@ -10,6 +11,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,9 +22,12 @@ public class ForgedProgression {
 
     public static final String MODID = "forgedprogression";
     public static final String NAME = "Forged Progression";
-    public static final String VERSION = "1.7.1";
+    public static final String VERSION = "1.8.0";
 
     public static final Logger LOGGER = LogManager.getLogger(NAME);
+
+    @Mod.Instance(MODID)
+    public static ForgedProgression instance;
 
     @SidedProxy(clientSide = "com.forgedprogression.client.ClientProxy", serverSide = "com.forgedprogression.CommonProxy")
     public static CommonProxy proxy;
@@ -44,5 +49,6 @@ public class ForgedProgression {
         ModSmelting.register();
         Progression.apply();
         proxy.init();
+        NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
     }
 }

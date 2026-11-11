@@ -1,0 +1,28 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "UNU",
+    "PSP",
+    "UNU"
+  ],
+  "key": {
+    "U": {
+      "type": "forge:ore_dict",
+      "ore": "blockUranium"
+    },
+    "N": {
+      "type": "forge:ore_dict",
+      "ore": "ingotNeutronium"
+    },
+    "P": {
+      "item": "minecraft:piston"
+    },
+    "S": {
+      "item": "minecraft:nether_star"
+    }
+  },
+  "result": {
+    "item": "forgedprogression:singularity_compressor",
+    "count": 1
+  }
+}

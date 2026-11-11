@@ -38,6 +38,21 @@ Stone pickaxes can no longer harvest iron, and iron pickaxes can no longer harve
   That's 54 neutronium and 27 quasium ingots per borealium ingot.
 - Every material has a storage block (9 ↔ 1), usable as a beacon base.
 
+## Singularity Compressor
+
+A heavy press for the densest metals. Right-click it to open a 3x3 grid that uses the **same layouts as the
+normal recipes** but gives more back:
+
+| Recipe (same layout as crafting table)               | Crafting table | Compressor |
+|------------------------------------------------------|----------------|------------|
+| 4 plutonium + 4 uranium + 1 iron                     | 1 neutronium   | **4 neutronium** |
+| 4 quasium shards + 4 neutronium + 1 end crystal      | 1 quasium      | **3 quasium** |
+| 6 neutronium blocks + 3 quasium blocks               | 1 borealium    | **4 borealium** |
+
+**Recipe:** `UNU` / `PSP` / `UNU`: 4 blocks of uranium, 2 neutronium ingots, 2 pistons and a nether star.
+It needs a plutonium pickaxe or better to pick back up. The block's tooltip lists its recipes, and anything
+left in the grid is returned when you close it.
+
 ## Stats
 
 | Material  | Harvest | Durability | Speed | Sword dmg | Armor (helm/chest/legs/boots) | Toughness |
