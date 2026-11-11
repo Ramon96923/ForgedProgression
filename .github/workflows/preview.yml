@@ -3,12 +3,7 @@ on:
   push:
     branches: [preview-textures]
 jobs:
-  textures:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: pip install pillow && python .preview/borealium.py
-  inspect:
+  server-smoke-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,15 +18,21 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '7.6.4'
-      - run: gradle compileJava --no-daemon -q
-      - name: Inspect skeleton bow handling
+      - name: Boot a dedicated server with the mod
         run: |
-          for f in $(find ~/.gradle -name '*.jar' 2>/dev/null | grep -iv -e sources -e installer -e userdev -e ForgeGradle); do
-            if unzip -l "$f" 2>/dev/null | grep -q 'net/minecraft/entity/monster/AbstractSkeleton.class'; then JAR="$f"; break; fi
+          mkdir -p run && echo "eula=true" > run/eula.txt
+          printf "online-mode=false\nlevel-type=DEFAULT\n" > run/server.properties
+          gradle runServer --no-daemon > server.log 2>&1 &
+          for i in $(seq 1 360); do
+            if grep -q "Done (" server.log; then echo "BOOTED"; break; fi
+            if grep -qiE "Encountered an unexpected exception|crash report|Failed to start" server.log; then echo "CRASHED"; break; fi
+            sleep 1
           done
-          echo "::notice title=jar::$JAR"
-          javap -c -p -classpath "$JAR" net.minecraft.entity.monster.AbstractSkeleton > sk.txt
-          javap -c -p -classpath "$JAR" net.minecraft.entity.ai.EntityAIAttackRangedBow > ai.txt
-          echo "::notice title=setCombatTask::$(awk '/void setCombatTask\(\)/,/return$/' sk.txt | grep -E 'instanceof|Field net/minecraft/init/Items' | tr -s ' ' | tr '\n' '|')"
-          echo "::notice title=rangedAttack::$(awk '/void attackEntityWithRangedAttack/,/return$/' sk.txt | grep -E 'instanceof|customizeArrow' | tr -s ' ' | tr '\n' '|')"
-          echo "::notice title=aiBowCheck::$(grep -E 'boolean isBowInMainhand|instanceof|Field net/minecraft/init/Items' ai.txt | tr -s ' ' | tr '\n' '|')"
+          sleep 15
+          pkill -f runServer || true; pkill -f GradleWorkerMain || true; pkill -f 'net.minecraft' || true
+          STATUS=$(grep -q "Done (" server.log && echo booted || echo "did not boot")
+          echo "::notice title=status::$STATUS"
+          echo "::notice title=done::$(grep -m1 'Done (' server.log | cut -c1-300)"
+          echo "::notice title=modloaded::$(grep -m3 -i 'forgedprogression\|Forged Progression' server.log | cut -c1-300 | tr '\n' '|')"
+          echo "::notice title=errors::$(grep -iE 'ERROR|Exception|Caused by' server.log | grep -viE 'Unable to download|realms|Could not find any|eula' | head -15 | cut -c1-250 | tr '\n' '|')"
+          echo "::notice title=hardmode::$(grep -iE 'mob cap|hard mode' server.log | head -3 | cut -c1-250 | tr '\n' '|')"
