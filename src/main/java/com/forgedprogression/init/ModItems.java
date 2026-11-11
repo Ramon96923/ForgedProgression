@@ -53,7 +53,7 @@ public final class ModItems {
         tools("plutonium", TOOL_PLUTONIUM, 10.0F, -2.9F);
         tools("neutronium", TOOL_NEUTRONIUM, 11.0F, -2.8F);
         tools("quasium", TOOL_QUASIUM, 12.5F, -2.7F);
-        tools("borealium", TOOL_BOREALIUM, 14.0F, -2.6F);
+        tools("borealium", TOOL_BOREALIUM, 32.0F, -2.6F); // axe shows 33 damage
 
         armor("copper", ARMOR_COPPER);
         armor("bronze", ARMOR_BRONZE);

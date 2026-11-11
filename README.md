@@ -50,7 +50,7 @@ Stone pickaxes can no longer harvest iron, and iron pickaxes can no longer harve
 | Plutonium | 6       | 3500       | 12.0  | 9         | 4 / 9 / 7 / 4                 | 4         |
 | Neutronium| 7       | 5000       | 14.0  | 10        | 4 / 10 / 8 / 4                | 5         |
 | Quasium   | 8       | 7000       | 16.0  | 11.5      | 5 / 11 / 9 / 5 (30, the max)  | 7         |
-| Borealium | 9       | 12000      | 20.0  | 13        | 5 / 11 / 9 / 5 (30, the max)  | 10        |
+| Borealium | 9       | 20000      | 50.0  | 30 (axe 33) | 5 / 11 / 9 / 5 (30, the max), 20,000 durability chestplate | 15 |
 
 Since quasium already hits Minecraft's armor cap of 30, borealium armor adds toughness, durability and a
 **full-set bonus**: wearing all four pieces gives permanent Resistance I and Fire Resistance
