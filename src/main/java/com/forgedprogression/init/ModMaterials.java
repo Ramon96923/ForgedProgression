@@ -12,6 +12,7 @@ import net.minecraftforge.common.util.EnumHelper;
  *   ruby 4 / 1800           uranium 5 / 2600   plutonium 6 / 3500
  *   neutronium 7 / 5000 (crafted from iron + uranium + plutonium, no ore)
  *   quasium 8 / 7000 (ore in the outer End, ingot also needs neutronium and an end crystal)
+ *   borealium 9 / 12000 (no ore; one ingot costs 6 neutronium blocks + 3 quasium blocks)
  */
 public final class ModMaterials {
 
@@ -24,6 +25,7 @@ public final class ModMaterials {
     public static final Item.ToolMaterial TOOL_PLUTONIUM = EnumHelper.addToolMaterial("FP_PLUTONIUM", 6, 3500, 12.0F, 5.0F, 16);
     public static final Item.ToolMaterial TOOL_NEUTRONIUM = EnumHelper.addToolMaterial("FP_NEUTRONIUM", 7, 5000, 14.0F, 6.0F, 18);
     public static final Item.ToolMaterial TOOL_QUASIUM = EnumHelper.addToolMaterial("FP_QUASIUM", 8, 7000, 16.0F, 7.5F, 22);
+    public static final Item.ToolMaterial TOOL_BOREALIUM = EnumHelper.addToolMaterial("FP_BOREALIUM", 9, 12000, 20.0F, 9.0F, 25);
 
     // texture, durability factor, protection {boots, legs, chest, helmet}, enchantability, sound, toughness
     public static final ItemArmor.ArmorMaterial ARMOR_COPPER = armor("copper", 10, new int[]{1, 3, 4, 1}, 10, 0.0F, false);
@@ -35,6 +37,8 @@ public final class ModMaterials {
     public static final ItemArmor.ArmorMaterial ARMOR_NEUTRONIUM = armor("neutronium", 66, new int[]{4, 8, 10, 4}, 18, 5.0F, true);
     // 30 total armor is Minecraft's cap, so quasium maxes it out
     public static final ItemArmor.ArmorMaterial ARMOR_QUASIUM = armor("quasium", 85, new int[]{5, 9, 11, 5}, 22, 7.0F, true);
+    // armor points are already at the cap, so borealium adds toughness, durability and a full-set bonus (see ArmorSetBonus)
+    public static final ItemArmor.ArmorMaterial ARMOR_BOREALIUM = armor("borealium", 120, new int[]{5, 9, 11, 5}, 25, 10.0F, true);
 
     private static ItemArmor.ArmorMaterial armor(String name, int durability, int[] protection, int enchant,
                                                  float toughness, boolean diamondSound) {

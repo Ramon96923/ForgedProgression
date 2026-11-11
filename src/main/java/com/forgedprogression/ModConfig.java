@@ -10,7 +10,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class ModConfig {
 
     @Config.Comment({"Harvest-level gating of vanilla ores. Tiers: 0=wood, 1=stone/copper, 2=bronze/iron,",
-            "3=steel/diamond, 4=ruby, 5=uranium, 6=plutonium, 7=neutronium, 8=quasium. Requires restart."})
+            "3=steel/diamond, 4=ruby, 5=uranium, 6=plutonium, 7=neutronium, 8=quasium, 9=borealium. Requires restart."})
     public static Progression progression = new Progression();
 
     @Config.Comment("Ore generation. Copper, tin, ruby and uranium spawn in the Overworld; plutonium and quasium spawn in End stone.")
@@ -70,7 +70,7 @@ public class ModConfig {
         public HardModeStage nether = new HardModeStage(1.5, 1.5, 1.5, 0.5, 0.35, 0.4, 0.3, 0.0, 0.0);
         @Config.Comment("Stage II: after entering the End. Replaces stage I's numbers (they don't stack).")
         public HardModeStage end = new HardModeStage(3.5, 3.0, 2.5, 1.5, 0.85, 0.8, 0.75, 0.5, 0.4)
-                .extras(0.3, 0.6, 2.0, 0.5, 0.25);
+                .extras(0.3, 0.6, 2.0, 0.5, 0.25).warBows(0.2);
     }
 
     public static class HardModeStage {
@@ -88,6 +88,8 @@ public class ModConfig {
         @Config.RangeDouble(min = 0, max = 1) public double weaponChance;
         @Config.Comment("Chance that each piece of mob gear (and skeleton bows) is enchanted.")
         @Config.RangeDouble(min = 0, max = 1) public double enchantChance;
+        @Config.Comment("Chance that a skeleton spawns holding a war bow instead of its normal bow (rarely dropped).")
+        @Config.RangeDouble(min = 0, max = 1) public double warBowChance = 0;
         @Config.Comment("Chance that a hostile mob spawns with permanent Speed.")
         @Config.RangeDouble(min = 0, max = 1) public double speedChance;
         @Config.Comment("Chance that a creeper spawns charged.")
@@ -116,6 +118,11 @@ public class ModConfig {
             this.chargedCreeperChance = chargedCreeper;
         }
 
+        HardModeStage warBows(double chance) {
+            this.warBowChance = chance;
+            return this;
+        }
+
         HardModeStage extras(double resistance, double fireResistance, double followRange, double knockback, double debuff) {
             this.resistanceChance = resistance;
             this.fireResistanceChance = fireResistance;
@@ -125,6 +132,9 @@ public class ModConfig {
             return this;
         }
     }
+
+    @Config.Comment("Wearing a full set of borealium armor gives permanent Resistance I and Fire Resistance.")
+    public static boolean borealiumSetBonus = true;
 
     @Config.Comment("Adds plutonium, uranium and rare neutronium ingots and quasium shards to End City treasure chests.")
     public static boolean endCityLoot = true;

@@ -47,9 +47,12 @@ public final class ClientTextures {
     private static final Metal PLUTONIUM = new Metal("plutonium", 0xAA46DC, false);
     private static final Metal NEUTRONIUM = new Metal("neutronium", 0x34405E, false);
     private static final Metal QUASIUM = new Metal("quasium", 0xF0389B, false);
+    /** Aurora: fades from green (bottom-left) to violet (top-right). */
+    private static final Metal BOREALIUM = new Metal("borealium", 0x2EF0A0, false);
+    private static final int BOREALIUM_TOP = 0x8A5CFF;
 
-    private static final Metal[] ALL = {COPPER, TIN, BRONZE, STEEL, RUBY, URANIUM, PLUTONIUM, NEUTRONIUM, QUASIUM};
-    private static final Metal[] GEAR = {COPPER, BRONZE, STEEL, RUBY, URANIUM, PLUTONIUM, NEUTRONIUM, QUASIUM};
+    private static final Metal[] ALL = {COPPER, TIN, BRONZE, STEEL, RUBY, URANIUM, PLUTONIUM, NEUTRONIUM, QUASIUM, BOREALIUM};
+    private static final Metal[] GEAR = {COPPER, BRONZE, STEEL, RUBY, URANIUM, PLUTONIUM, NEUTRONIUM, QUASIUM, BOREALIUM};
     private static final String[] TOOLS = {"pickaxe", "axe", "shovel", "hoe", "sword"};
     private static final String[] ARMOR = {"helmet", "chestplate", "leggings", "boots"};
 
@@ -99,6 +102,12 @@ public final class ClientTextures {
         // quasium also generates in the End; diamond-ore spots so it doesn't look like plutonium
         map.put(block("quasium_ore"), new Spec(MC + "blocks/diamond_ore.png", Match.COLORED, QUASIUM.color,
                 MC + "blocks/end_stone.png", Shading.DEFAULT));
+
+        for (Map.Entry<String, Spec> e : map.entrySet()) {
+            if (e.getKey().contains("borealium")) {
+                e.getValue().gradientTo(BOREALIUM_TOP);
+            }
+        }
         return map;
     }
 
@@ -129,6 +138,9 @@ public final class ClientTextures {
                         "textures/models/armor/" + m.name + "_layer_" + layer + ".png");
                 Spec spec = new Spec(MC + "models/armor/" + m.base() + "_layer_" + layer + ".png", m.match(), m.color,
                         m.gem ? Shading.DEFAULT : Shading.ARMOR_WORN);
+                if (m == BOREALIUM) {
+                    spec.gradientTo(BOREALIUM_TOP);
+                }
                 tm.loadTexture(target, new RecoloredTexture(spec));
             }
         }

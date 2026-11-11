@@ -1,0 +1,13 @@
+{
+  "type": "forge:ore_shapeless",
+  "ingredients": [
+    {
+      "type": "forge:ore_dict",
+      "ore": "blockBorealium"
+    }
+  ],
+  "result": {
+    "item": "forgedprogression:borealium_ingot",
+    "count": 9
+  }
+}

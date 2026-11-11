@@ -104,15 +104,14 @@ public class ItemModBow extends ItemBow {
             if (power == 1.0F) {
                 arrow.setIsCritical(true);
             }
-            arrow.setDamage(arrow.getDamage() * damageMultiplier);
 
             int powerLevel = EnchantmentHelper.getEnchantmentLevel(Enchantments.POWER, stack);
             if (powerLevel > 0) {
                 arrow.setDamage(arrow.getDamage() + powerLevel * 0.5D + 0.5D);
             }
-            int knockback = EnchantmentHelper.getEnchantmentLevel(Enchantments.PUNCH, stack) + bonusKnockback;
-            if (knockback > 0) {
-                arrow.setKnockbackStrength(knockback);
+            int punch = EnchantmentHelper.getEnchantmentLevel(Enchantments.PUNCH, stack);
+            if (punch > 0) {
+                arrow.setKnockbackStrength(punch + bonusKnockback);
             }
             if (EnchantmentHelper.getEnchantmentLevel(Enchantments.FLAME, stack) > 0) {
                 arrow.setFire(100);
@@ -137,6 +136,19 @@ public class ItemModBow extends ItemBow {
             }
         }
         player.addStat(StatList.getObjectUseStats(this));
+    }
+
+    /**
+     * The bow's damage and built-in knockback. Forge calls this for players (above) and for skeletons
+     * holding this bow, so a skeleton with a war bow hits like one.
+     */
+    @Override
+    public EntityArrow customizeArrow(EntityArrow arrow) {
+        arrow.setDamage(arrow.getDamage() * damageMultiplier);
+        if (bonusKnockback > 0) {
+            arrow.setKnockbackStrength(bonusKnockback);
+        }
+        return arrow;
     }
 
     /** Same search order as vanilla: offhand, main hand, then the inventory. */

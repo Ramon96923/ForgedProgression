@@ -2,6 +2,7 @@ package com.forgedprogression.world;
 
 import com.forgedprogression.ForgedProgression;
 import com.forgedprogression.ModConfig;
+import com.forgedprogression.init.ModItems;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
@@ -316,8 +317,14 @@ public final class HardMode {
                 mob.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, maybeEnchant(weapon, rand, stage, cfg));
             }
         }
+        if (skeleton && rand.nextDouble() < cfg.warBowChance) {
+            // Forge lets skeletons use any bow, and ItemModBow.customizeArrow gives their arrows the war bow's stats
+            ItemStack warBow = new ItemStack(ModItems.WAR_BOW);
+            warBow.setItemDamage(rand.nextInt(warBow.getMaxDamage() / 2) + warBow.getMaxDamage() / 4); // worn if it drops
+            mob.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, warBow);
+            mob.setDropChance(EntityEquipmentSlot.MAINHAND, 0.02F);
+        }
         if (skeleton && !mob.getHeldItemMainhand().isEmpty() && !mob.getHeldItemMainhand().isItemEnchanted()) {
-            // skeletons keep their vanilla bow (their AI only works with it) but it may be enchanted
             maybeEnchant(mob.getHeldItemMainhand(), rand, stage, cfg);
         }
     }

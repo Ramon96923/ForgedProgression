@@ -64,9 +64,16 @@ public final class Recolor {
         final Shading shading;
         /** Vanilla's pulled-back bow textures draw the arrow on the diagonal; skip it so the arrow stays brown. */
         boolean skipBowArrow;
+        /** Optional second color: the target fades from color (bottom-left) to color2 (top-right). -1 = none. */
+        int color2 = -1;
 
         public Spec skipBowArrow() {
             this.skipBowArrow = true;
+            return this;
+        }
+
+        public Spec gradientTo(int color2) {
+            this.color2 = color2;
             return this;
         }
 
@@ -89,7 +96,7 @@ public final class Recolor {
         public BufferedImage render(IResourceManager manager) throws IOException {
             BufferedImage src = read(manager, source);
             BufferedImage bg = background == null ? null : read(manager, background);
-            return apply(src, match, color, bg, shading, skipBowArrow);
+            return apply(src, match, color, color2, bg, shading, skipBowArrow);
         }
     }
 
@@ -99,8 +106,8 @@ public final class Recolor {
         }
     }
 
-    public static BufferedImage apply(BufferedImage src, Match match, int target, BufferedImage background, Shading s,
-                                      boolean skipBowArrow) {
+    public static BufferedImage apply(BufferedImage src, Match match, int target, int target2, BufferedImage background,
+                                      Shading s, boolean skipBowArrow) {
         int w = src.getWidth();
         int h = src.getHeight();
         int[] px = src.getRGB(0, 0, w, h, null, 0, w);
@@ -135,7 +142,9 @@ public final class Recolor {
             }
         }
 
-        int tr = (target >> 16) & 0xFF, tg = (target >> 8) & 0xFF, tb = target & 0xFF;
+        int r1 = (target >> 16) & 0xFF, g1 = (target >> 8) & 0xFF, b1 = target & 0xFF;
+        int c2 = target2 < 0 ? target : target2;
+        int r2 = (c2 >> 16) & 0xFF, g2 = (c2 >> 8) & 0xFF, b2 = c2 & 0xFF;
         boolean useBg = background != null && background.getWidth() == w && background.getHeight() >= h;
         int[] bgPx = useBg ? background.getRGB(0, 0, w, h, null, 0, w) : null;
 
@@ -144,6 +153,11 @@ public final class Recolor {
             int a = px[i] >>> 24;
             if (hit[i]) {
                 int r = (px[i] >> 16) & 0xFF, g = (px[i] >> 8) & 0xFF, b = px[i] & 0xFF;
+                // diagonal position, 0 at bottom-left to 1 at top-right
+                double t = (i % w + (h - 1 - i / w)) / (double) Math.max(1, (w - 1) + (h - 1));
+                int tr = (int) Math.round(r1 + (r2 - r1) * t);
+                int tg = (int) Math.round(g1 + (g2 - g1) * t);
+                int tb = (int) Math.round(b1 + (b2 - b1) * t);
                 double l = luma(r, g, b);
                 double ratio = l / reference;
                 if (s.contrast != 1.0) {

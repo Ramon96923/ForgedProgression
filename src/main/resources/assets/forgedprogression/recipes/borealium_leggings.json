@@ -1,0 +1,18 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "XXX",
+    "X X",
+    "X X"
+  ],
+  "key": {
+    "X": {
+      "type": "forge:ore_dict",
+      "ore": "ingotBorealium"
+    }
+  },
+  "result": {
+    "item": "forgedprogression:borealium_leggings",
+    "count": 1
+  }
+}

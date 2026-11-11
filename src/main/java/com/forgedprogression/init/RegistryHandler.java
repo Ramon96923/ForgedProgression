@@ -50,6 +50,7 @@ public final class RegistryHandler {
         OreDictionary.registerOre("blockPlutonium", ModBlocks.PLUTONIUM_BLOCK);
         OreDictionary.registerOre("blockNeutronium", ModBlocks.NEUTRONIUM_BLOCK);
         OreDictionary.registerOre("blockQuasium", ModBlocks.QUASIUM_BLOCK);
+        OreDictionary.registerOre("blockBorealium", ModBlocks.BOREALIUM_BLOCK);
 
         OreDictionary.registerOre("ingotCopper", ModItems.COPPER_INGOT);
         OreDictionary.registerOre("ingotTin", ModItems.TIN_INGOT);
@@ -61,6 +62,7 @@ public final class RegistryHandler {
         OreDictionary.registerOre("ingotNeutronium", ModItems.NEUTRONIUM_INGOT);
         OreDictionary.registerOre("gemQuasium", ModItems.QUASIUM_SHARD);
         OreDictionary.registerOre("ingotQuasium", ModItems.QUASIUM_INGOT);
+        OreDictionary.registerOre("ingotBorealium", ModItems.BOREALIUM_INGOT);
     }
 
     private RegistryHandler() {}

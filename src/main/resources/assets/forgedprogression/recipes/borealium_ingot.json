@@ -1,0 +1,22 @@
+{
+  "type": "forge:ore_shaped",
+  "pattern": [
+    "NQN",
+    "NQN",
+    "NQN"
+  ],
+  "key": {
+    "N": {
+      "type": "forge:ore_dict",
+      "ore": "blockNeutronium"
+    },
+    "Q": {
+      "type": "forge:ore_dict",
+      "ore": "blockQuasium"
+    }
+  },
+  "result": {
+    "item": "forgedprogression:borealium_ingot",
+    "count": 1
+  }
+}

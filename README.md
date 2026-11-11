@@ -1,6 +1,6 @@
 # Forged Progression (Forge 1.12.2)
 
-Adds copper, tin, bronze, steel, ruby, uranium, plutonium, neutronium and quasium, with tools and armor for each
+Adds copper, tin, bronze, steel, ruby, uranium, plutonium, neutronium, quasium and borealium, with tools and armor for each
 tier, and raises the pickaxe tier needed for vanilla ores so every material is a required step.
 
 ## Progression
@@ -15,7 +15,8 @@ tier, and raises the pickaxe tier needed for vanilla ores so every material is a
 | 5    | **Uranium**           | **Plutonium ore** (in the End)                  |
 | 6    | **Plutonium**         | Everything                                      |
 | 7    | **Neutronium**        | **Quasium ore** (outer End islands)             |
-| 8    | **Quasium**           | Top tier                                        |
+| 8    | **Quasium**           | Everything                                      |
+| 9    | **Borealium**         | Top tier (crafted, no ore)                      |
 
 Stone pickaxes can no longer harvest iron, and iron pickaxes can no longer harvest diamonds.
 
@@ -33,6 +34,8 @@ Stone pickaxes can no longer harvest iron, and iron pickaxes can no longer harve
   gateway), rare. Needs a neutronium pickaxe. Smelt it into quasium shards.
 - **Quasium ingot**: 4 quasium shards (corners) + 4 neutronium ingots (sides) + 1 end crystal (center).
   That's 16 plutonium, 16 uranium and an end crystal per ingot.
+- **Borealium ingot**: 6 blocks of neutronium + 3 blocks of quasium (`NQN` in every row) for **one** ingot.
+  That's 54 neutronium and 27 quasium ingots per borealium ingot.
 - Every material has a storage block (9 ↔ 1), usable as a beacon base.
 
 ## Stats
@@ -47,6 +50,11 @@ Stone pickaxes can no longer harvest iron, and iron pickaxes can no longer harve
 | Plutonium | 6       | 3500       | 12.0  | 9         | 4 / 9 / 7 / 4                 | 4         |
 | Neutronium| 7       | 5000       | 14.0  | 10        | 4 / 10 / 8 / 4                | 5         |
 | Quasium   | 8       | 7000       | 16.0  | 11.5      | 5 / 11 / 9 / 5 (30, the max)  | 7         |
+| Borealium | 9       | 12000      | 20.0  | 13        | 5 / 11 / 9 / 5 (30, the max)  | 10        |
+
+Since quasium already hits Minecraft's armor cap of 30, borealium armor adds toughness, durability and a
+**full-set bonus**: wearing all four pieces gives permanent Resistance I and Fire Resistance
+(`borealiumSetBonus` in the config). Borealium textures fade from aurora green to violet.
 | *Diamond (vanilla)* | 3 | 1561     | 8.0   | 7         | 3 / 8 / 6 / 3                 | 2         |
 
 Tools and armor use vanilla crafting shapes and repair in an anvil with their ingot or gem.
@@ -105,6 +113,7 @@ Hard mode has two stages for the whole world, each announced in chat:
 | Knockback resistance | none | **50%** |
 | Hits give Slowness/Weakness (3 s) | none | **25%** of hits |
 | Charged creepers | none | **40%** |
+| Skeletons with a **war bow** | none | **20%** (their arrows get the war bow's damage and knockback; the bow rarely drops, already worn) |
 
 Stage II replaces stage I's numbers rather than stacking. Mobs already around when stage II starts get the new
 health but keep their gear. Hard mode is saved with the world and never turns off; bosses aren't affected (they
