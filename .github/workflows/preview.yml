@@ -3,8 +3,35 @@ on:
   push:
     branches: [preview-textures]
 jobs:
-  preview:
+  textures:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: pip install pillow && python .preview/quasium.py
+      - run: pip install pillow && python .preview/borealium.py
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: |
+            8
+            17
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '7.6.4'
+      - run: gradle compileJava --no-daemon -q
+      - name: Inspect skeleton bow handling
+        run: |
+          for f in $(find ~/.gradle -name '*.jar' 2>/dev/null | grep -iv -e sources -e installer -e userdev -e ForgeGradle); do
+            if unzip -l "$f" 2>/dev/null | grep -q 'net/minecraft/entity/monster/AbstractSkeleton.class'; then JAR="$f"; break; fi
+          done
+          echo "::notice title=jar::$JAR"
+          javap -c -p -classpath "$JAR" net.minecraft.entity.monster.AbstractSkeleton > sk.txt
+          javap -c -p -classpath "$JAR" net.minecraft.entity.ai.EntityAIAttackRangedBow > ai.txt
+          echo "::notice title=setCombatTask::$(awk '/void setCombatTask\(\)/,/return$/' sk.txt | grep -E 'instanceof|Field net/minecraft/init/Items' | tr -s ' ' | tr '\n' '|')"
+          echo "::notice title=rangedAttack::$(awk '/void attackEntityWithRangedAttack/,/return$/' sk.txt | grep -E 'instanceof|customizeArrow' | tr -s ' ' | tr '\n' '|')"
+          echo "::notice title=aiBowCheck::$(grep -E 'boolean isBowInMainhand|instanceof|Field net/minecraft/init/Items' ai.txt | tr -s ' ' | tr '\n' '|')"
