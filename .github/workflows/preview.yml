@@ -18,26 +18,25 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '7.6.4'
-      - name: Boot a dedicated server with the mod
+      - run: gradle build --no-daemon -q
+      - name: Install a real Forge 1.12.2 server and boot it with the mod
         run: |
-          mkdir -p run && echo "eula=true" > run/eula.txt
-          printf "online-mode=false\nlevel-type=DEFAULT\n" > run/server.properties
-          gradle runServer --no-daemon > server.log 2>&1 &
-          for i in $(seq 1 360); do
-            if grep -q "Done (" server.log; then echo "BOOTED"; break; fi
-            if grep -qiE "Encountered an unexpected exception|crash report|Failed to start" server.log; then echo "CRASHED"; break; fi
-            sleep 1
-          done
-          sleep 15
-          pkill -f runServer || true; pkill -f GradleWorkerMain || true; pkill -f 'net.minecraft' || true
+          J8=$(ls -d /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/8*/x64 | head -1)/bin/java
+          mkdir srv && cd srv
+          curl -sL -o installer.jar https://maven.minecraftforge.net/net/minecraftforge/forge/1.12.2-14.23.5.2860/forge-1.12.2-14.23.5.2860-installer.jar
+          $J8 -jar installer.jar --installServer > install.log 2>&1 || true
+          echo "::notice title=install::$(tail -2 install.log | tr '\n' '|')"
+          mkdir -p mods && cp ../build/libs/*.jar mods/
+          echo "::notice title=modjar::$(ls mods | tr '\n' ' ')"
+          echo "eula=true" > eula.txt
+          printf "online-mode=false\nmax-tick-time=-1\n" > server.properties
+          FORGE=$(ls forge-1.12.2-*.jar | grep -v installer | head -1)
+          ( sleep 240; echo stop ) | timeout 300 $J8 -Xmx2G -jar "$FORGE" nogui > server.log 2>&1 || true
           STATUS=$(grep -q "Done (" server.log && echo booted || echo "did not boot")
           echo "::notice title=status::$STATUS"
-          echo "::notice title=done::$(grep -m1 'Done (' server.log | cut -c1-300)"
-          echo "::notice title=modloaded::$(grep -m3 -i 'forgedprogression\|Forged Progression' server.log | cut -c1-300 | tr '\n' '|')"
-          echo "::notice title=errors::$(grep -iE 'ERROR|Exception|Caused by' server.log | grep -viE 'Unable to download|realms|Could not find any|eula' | head -15 | cut -c1-250 | tr '\n' '|')"
+          echo "::notice title=done::$(grep -m1 'Done (' server.log | cut -c1-200)"
+          echo "::notice title=mods::$(grep -m3 -iE 'forgedprogression|Forged Progression' server.log | cut -c1-250 | tr '\n' '|')"
+          echo "::notice title=fp-log::$(grep -E '\[Forged Progression\]' server.log | head -10 | cut -c1-250 | tr '\n' '|')"
+          echo "::notice title=errors::$(grep -iE 'ERROR|Exception|Caused by' server.log | head -15 | cut -c1-250 | tr '\n' '|')"
           L=$(grep -n 'Encountered an unexpected exception' server.log | head -1 | cut -d: -f1)
-          sed -n "$((L+1)),$((L+40))p" server.log | grep -vE '^\s+at (com.google|sun.reflect|java.lang.reflect|net.minecraftforge.fml.common.(LoadController|Loader|FMLModContainer)|org.apache)' | cut -c1-230 > tail.txt
-          split -l 12 tail.txt part_
-          for f in part_*; do echo "::notice title=tail-$f::$(tr '\n' '|' < $f)"; done
-          echo "::notice title=crash::$(grep -n -iE 'unexpected exception|crash|Failed to start|FATAL' server.log | head -5 | cut -c1-250 | tr '\n' '|')"
-          echo "::notice title=hardmode::$(grep -iE 'mob cap|hard mode' server.log | head -3 | cut -c1-250 | tr '\n' '|')"
+          if [ -n "$L" ]; then echo "::notice title=crash::$(sed -n "$((L+1)),$((L+25))p" server.log | cut -c1-230 | tr '\n' '|')"; fi
